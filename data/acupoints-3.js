@@ -79,7 +79,7 @@ window.ACUPARTS_3 = [
       "项强",
       "瘰疬"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『天牖，在颈筋间，缺盆上，天容后，天柱前，完骨后，发际上，手少阳脉气所发，刺入一分，灸三壮。』",
     "caution": "颈部穴位按揉宜轻柔，避开颈动脉搏动处。",
     "detailed": true
   },
@@ -99,7 +99,7 @@ window.ACUPARTS_3 = [
       "颈项强痛",
       "耳痛"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『窍阴，在完骨上，枕骨下，摇动应手，足太阳、少阳之会，刺入四分，灸五壮。』",
     "caution": "",
     "detailed": true
   },
@@ -119,7 +119,7 @@ window.ACUPARTS_3 = [
       "中风",
       "偏瘫"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『本神，在曲差两傍各一寸五分，在发际（一曰直耳上入发际四分）足少阳、阳维之会，刺入三分，灸三壮。』",
     "caution": "",
     "detailed": true
   },
@@ -139,7 +139,7 @@ window.ACUPARTS_3 = [
       "鼻塞",
       "小儿惊痫"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『直入发际五分陷者中，足太阳、少阳、阳维之会，刺入三分，留七呼，灸五壮。』",
     "caution": "",
     "detailed": true
   },
@@ -160,7 +160,7 @@ window.ACUPARTS_3 = [
       "口噤",
       "面瘫"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『完骨，在耳后，入发际四分，足太阳、少阳之会，刺入二分，留七呼，灸七壮。』",
     "caution": "",
     "detailed": true
   },
@@ -181,7 +181,7 @@ window.ACUPARTS_3 = [
       "带下",
       "产后恶露不止"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『阴交，一名少关，一名横户，在脐下一寸，任脉、气冲之会，刺入八分，灸五壮。』",
     "caution": "孕妇慎用。",
     "detailed": true
   },
@@ -200,7 +200,7 @@ window.ACUPARTS_3 = [
       "食欲不振",
       "水肿"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『建里，在中脘下一寸，刺入五分，留十呼，灸五壮。』",
     "caution": "",
     "detailed": true
   },
@@ -220,7 +220,7 @@ window.ACUPARTS_3 = [
       "脊背强痛",
       "心痛"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『神道，在第五椎节下间，督脉气所发，俯而取之，刺入五分，留五呼，灸三壮。』",
     "caution": "",
     "detailed": true
   },
@@ -240,7 +240,7 @@ window.ACUPARTS_3 = [
       "脊背强痛",
       "癫狂"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『陶道，在大椎节下间，督脉、足太阳之会，俯而取之，刺入五分，留五呼，灸五壮。』",
     "caution": "",
     "detailed": true
   },
@@ -258,7 +258,7 @@ window.ACUPARTS_3 = [
       "腹痛",
       "痿痹"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『髀关，在膝上伏兔后交分中，刺入六分，灸三壮。』",
     "caution": "",
     "detailed": true
   },
@@ -275,7 +275,7 @@ window.ACUPARTS_3 = [
       "上肢酸麻",
       "咳嗽"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『举臂有空，手阳明太阳、手足少阳之会，举臂取之，刺入五分，灸五壮。』",
     "caution": "",
     "detailed": true
   },
@@ -293,7 +293,7 @@ window.ACUPARTS_3 = [
       "腹痛",
       "痢疾"
     ],
-    "classic": "",
+    "classic": "《针灸甲乙经》：『大横，在腹哀下三寸，直脐傍，足太阴、阴维之会，刺入七分，灸五壮。』",
     "caution": "孕妇慎按。",
     "detailed": true
   },
