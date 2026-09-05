@@ -3,3 +3,4 @@ _out/
 *.log
 .DS_Store
 Thumbs.db
+.work/src/

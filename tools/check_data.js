@@ -20,7 +20,7 @@ const errors = [];
 const warn = [];
 
 /* ---------- 加载与语法 ---------- */
-const files = ["data/acupoints-1.js", "data/acupoints-2.js", "data/acupoints-3.js", "data/meridian-index.js", "data/theory.js", "data/classics.js", "data/nanjing.js", "data/compare.js"];
+const files = ["data/acupoints-1.js", "data/acupoints-2.js", "data/acupoints-3.js", "data/meridian-index.js", "data/theory.js", "data/classics.js", "data/nanjing.js", "data/suwen.js", "data/compare.js"];
 let syntaxOK = true;
 for (const f of files) {
   try {
@@ -36,6 +36,7 @@ const idx = window.MERIDIAN_INDEX || [];
 const theory = window.THEORY || [];
 const lingshu = window.LINGSHU || [];
 const nanjing = window.NANJING || [];
+const suwen = window.SUWEN || [];
 
 const abbrMap = { "手太阴肺经": "LU", "手阳明大肠经": "LI", "足阳明胃经": "ST", "足太阴脾经": "SP", "手少阴心经": "HT", "手太阳小肠经": "SI", "足太阳膀胱经": "BL", "足少阴肾经": "KI", "手厥阴心包经": "PC", "手少阳三焦经": "TE", "足少阳胆经": "GB", "足厥阴肝经": "LV", "任脉": "CV", "督脉": "GV", "经外奇穴": "EX" };
 const EXisting = ["经外奇穴"];
@@ -110,6 +111,20 @@ for (const ch of lingshu) {
   }
   if (ch.source && !ch.source.includes("《")) warn.push("篇章 source 疑似缺书名号: " + ch.id);
 }
+for (const ch of suwen) {
+  if (cIdSeen[ch.id]) errors.push("经典篇章 id 重复: " + ch.id);
+  cIdSeen[ch.id] = 1;
+  if (!ch.id || !ch.id.startsWith("sw-")) errors.push("素问篇 id 非法（须以 sw- 开头）: " + (ch.id || "(无id)"));
+  if (!Array.isArray(ch.sections) || !ch.sections.length) errors.push("素问篇无 sections: " + ch.id);
+  let n = 0;
+  for (const s of ch.sections || []) {
+    n++;
+    if (!s.original) errors.push("条文缺原文: " + ch.id + " 第" + n + "条");
+    if (!s.translation) errors.push("条文缺译文: " + ch.id + " 第" + n + "条");
+    if (!s.translation.includes("AI 参考译文") && s.translation) warn.push("译文缺「AI 参考译文」标注: " + ch.id + " 第" + n + "条");
+  }
+  if (ch.source && !ch.source.includes("《")) warn.push("篇章 source 疑似缺书名号: " + ch.id);
+}
 for (const nj of nanjing) {
   if (cIdSeen[nj.id]) errors.push("经典篇章 id 重复: " + nj.id);
   cIdSeen[nj.id] = 1;
@@ -137,7 +152,7 @@ for (const g of window.COMPARE_GROUPS || []) {
 /* ---------- 汇总 ---------- */
 console.log("== 针经堂数据校验 ==");
 console.log("精讲穴 " + pts.filter((p) => p.detailed).length + " / 总条目 " + pts.length +
-  "；经脉索引 " + idx.length + " 条；理论 " + theory.length + " 课；灵枢 " + lingshu.length + " 篇 + 难经 " + nanjing.length + " 难");
+  "；经脉索引 " + idx.length + " 条；理论 " + theory.length + " 课；灵枢 " + lingshu.length + " 篇 + 素问 " + suwen.length + " 篇 + 难经 " + nanjing.length + " 难");
 if (warn.length) {
   console.log("警告 " + warn.length + " 条：");
   warn.forEach((w) => console.log("  ⚠ " + w));

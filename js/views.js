@@ -32,7 +32,7 @@
     })
   }];
 
-  function allChapters() { return (window.LINGSHU || []).concat(nanjingChapters); }
+  function allChapters() { return (window.LINGSHU || []).concat(window.SUWEN || []).concat(nanjingChapters); }
   var chapterMap = {}; allChapters().forEach(function (c) { chapterMap[c.id] = c; });
 
   function chapterSections(c) {
@@ -130,7 +130,7 @@
             '<div style="font-size:14px;line-height:2.3">' +
             '<span class="tag moss">理论</span><a href="#/theory">理论五课</a>——经络、腧穴、刺灸安全、特定穴、自我保健<br>' +
             '<span class="tag moss">穴位</span><a href="#/meridians">经络穴位</a>——十四经木刻图与' + allPoints().filter(function (p) { return p.detailed; }).length + '个精讲穴<br>' +
-            '<span class="tag moss">经典</span><a href="#/classics">经典诵读</a>——《灵枢》十一篇与《难经》九难<br>' +
+            '<span class="tag moss">经典</span><a href="#/classics">经典诵读</a>——《灵枢》十五篇、素问针灸选篇与《难经》九难<br>' +
             '<span class="tag moss">检索</span><a href="#/search">全文搜索</a>——按穴名、症名、条文查</div>' +
           '</div>' +
         '</div>' +
@@ -245,7 +245,7 @@
     }).join("");
     var recited = Store.recitedTodayCount();
     return '<div class="page"><div class="page-title">经典诵读<span class="zh-dot"> · </span>针灸之源</div>' +
-      '<div class="page-sub">' + (recited ? '今日已诵 ' + recited + ' 篇 · ' : '') + '《灵枢》为针灸之源，《难经》申其穴法 · <span class="src">译文为 AI 参考译文；读毕可在篇内盖「今日已诵」印</span></div>' + items + '</div>';
+      '<div class="page-sub">' + (recited ? '今日已诵 ' + recited + ' 篇 · ' : '') + '《灵枢》为针灸之源，《素问》申其刺法，《难经》明其穴理 · <span class="src">译文为 AI 参考译文；读毕可在篇内盖「今日已诵」印</span></div>' + items + '</div>';
   }
 
   function debateHtml(d) {
