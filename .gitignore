@@ -1,0 +1,5 @@
+# 本地验证产物与临时文件，不入库
+_out/
+*.log
+.DS_Store
+Thumbs.db

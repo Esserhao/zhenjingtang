@@ -1,0 +1,636 @@
+/* views.js —— 页面渲染。依赖：Store、各 data/*.js 挂载的全局数据。由 app.js 调用。 */
+(function () {
+  "use strict";
+
+  /* ---------- 数据归一化 ---------- */
+  var MER_ABBR = { "手太阴肺经": "LU", "手阳明大肠经": "LI", "足阳明胃经": "ST", "足太阴脾经": "SP",
+    "手少阴心经": "HT", "手太阳小肠经": "SI", "足太阳膀胱经": "BL", "足少阴肾经": "KI",
+    "手厥阴心包经": "PC", "手少阳三焦经": "TE", "足少阳胆经": "GB", "足厥阴肝经": "LV",
+    "任脉": "CV", "督脉": "GV", "经外奇穴": "EX" };
+  var MER_NAME = { LU: "手太阴肺经", LI: "手阳明大肠经", ST: "足阳明胃经", SP: "足太阴脾经",
+    HT: "手少阴心经", SI: "手太阳小肠经", BL: "足太阳膀胱经", KI: "足少阴肾经",
+    PC: "手厥阴心包经", TE: "手少阳三焦经", GB: "足少阳胆经", LV: "足厥阴肝经",
+    CV: "任脉", GV: "督脉", EX: "经外奇穴" };
+  /* 只有十四经有古籍木刻图；经外奇穴无图，渲染时用占位块 */
+  var MER_HAS_IMG = { LU: 1, LI: 1, ST: 1, SP: 1, HT: 1, SI: 1, BL: 1, KI: 1, PC: 1, TE: 1, GB: 1, LV: 1, CV: 1, GV: 1 };
+
+  function allPoints() {
+    return (window.ACUPARTS_1 || []).concat(window.ACUPARTS_2 || []).concat(window.ACUPARTS_3 || []);
+  }
+  var pointMap = {};
+  allPoints().forEach(function (p) { pointMap[p.id] = p; });
+
+  /* 难经归一为经典章节（每难一条 section） */
+  var nanjingChapters = [{
+    id: "nj-group", title: "难经 · 六十二难至六十八难", source: "《难经》",
+    note: "论五输穴与原穴、募穴——穴位理论的总纲，与《灵枢·本输》对照读",
+    sections: (window.NANJING || []).map(function (n, i) {
+      return {
+        label: "第" + n.num + "难", original: n.original, translation: n.translation,
+        keynotes: n.keynotes, debate: n.debate, cases: n.cases, secId: "nj-group#" + i
+      };
+    })
+  }];
+
+  function allChapters() { return (window.LINGSHU || []).concat(nanjingChapters); }
+  var chapterMap = {}; allChapters().forEach(function (c) { chapterMap[c.id] = c; });
+
+  function chapterSections(c) {
+    return c.sections.map(function (s, i) {
+      s.secId = s.secId || c.id + "#" + i;
+      return s;
+    });
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  /* keynotes/translation 可能带「【AI 参考译文】」前缀，交给 CSS 呈现 */
+  function stripPrefix(s) { return String(s || "").replace(/^【AI\s*参考译文】[:：]?/, "").replace(/^零基础要点[:：]?/, ""); }
+
+  /* ---------- 通用小件 ---------- */
+  function readToggleHtml(id) {
+    return '<button class="read-toggle' + (Store.isRead(id) ? " on" : "") + '" onclick="App.toggleRead(this, \'' + id + '\')">已读</button>';
+  }
+  function noteBoxHtml(id) {
+    return '<div class="field"><div class="fl">朱批 · 个人笔记</div>' +
+      '<textarea class="note-box" id="note-' + esc(id) + '" placeholder="写点心得，随手记……">' + esc(Store.getNote(id)) + '</textarea>' +
+      '<div style="margin-top:6px"><button class="btn ghost" onclick="App.saveNote(\'' + id + '\')">保存笔记</button></div></div>';
+  }
+  function progressPct() {
+    var total = allPoints().filter(function (p) { return p.detailed; }).length +
+      (window.THEORY || []).reduce(function (s, c) { return s + c.sections.length; }, 0) +
+      allChapters().reduce(function (s, c) { return s + c.sections.length; }, 0);
+    return total ? Math.round(Store.readCount() / total * 100) : 0;
+  }
+
+  /* ---------- 首页 ---------- */
+  function pickDaily() {
+    var t = Store.today(), saved = Store.getDaily(t);
+    if (saved && pointMap[saved]) return pointMap[saved];
+    /* 以日期做确定性抽取：djb2 hash → 详细穴位 */
+    var h = 5381;
+    for (var i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0;
+    var list = allPoints().filter(function (p) { return p.detailed; });
+    var p = list[h % list.length];
+    Store.setDaily(t, p.id);
+    return p;
+  }
+  function pickQuote() {
+    var secs = [];
+    allChapters().forEach(function (c) {
+      chapterSections(c).forEach(function (s) { if (s.original && s.original.length < 60) secs.push({ src: c.title, original: s.original }); });
+    });
+    var t = Store.today(), h = 52711;
+    for (var i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0;
+    return secs[h % secs.length];
+  }
+
+  function homeView() {
+    var p = pickDaily(), q = pickQuote();
+    var days = Store.days(), streak = Store.streak();
+    /* 打卡绿墙：最近 15 周，列=周，行=星期（首列补空对齐） */
+    var cells = "", start = new Date();
+    start.setHours(12, 0, 0, 0);
+    start.setDate(start.getDate() - 104);
+    start.setDate(start.getDate() - start.getDay()); // 回退到周日
+    var end = new Date(); end.setHours(12, 0, 0, 0);
+    var total = Math.round((end - start) / 86400000);
+    for (var i = 0; i <= total; i++) {
+      var d = new Date(start.getTime() + i * 86400000);
+      var k = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      var n = days[k] || 0;
+      var lvl = n === 0 ? "" : n <= 1 ? "l1" : n <= 2 ? "l2" : n <= 4 ? "l3" : "l4";
+      cells += '<div class="cell ' + lvl + '" title="' + k + " · " + n + ' 条"></div>';
+    }
+    var recentNotes = Object.keys(Store.raw().notes).length;
+
+    return '<div class="page">' +
+      '<div class="page-title">针经堂<span class="zh-dot"> · </span>针灸自学</div>' +
+      '<div class="page-sub">零基础起步 · 以《灵枢》为经，以腧穴为纬 · <span class="src">学以致用，先保健后针道</span></div>' +
+      '<div class="stats-row">' +
+        '<div class="stat"><div class="num">' + Store.readCount() + '</div><div class="lbl">已读条目</div></div>' +
+        '<div class="stat"><div class="num">' + streak + '</div><div class="lbl">连续天数</div></div>' +
+        '<div class="stat"><div class="num">' + recentNotes + '</div><div class="lbl">朱批笔记</div></div>' +
+        '<div class="stat"><div class="num">' + progressPct() + '%</div><div class="lbl">总进度</div></div>' +
+      '</div>' +
+      '<div class="home-grid">' +
+        '<div class="daily-card">' +
+          '<h3>' + esc(p.name) + '</h3><div class="py">' + esc(p.pinyin) + ' · ' + esc(p.meridian) + (p.special ? ' · ' + esc(p.special) : '') + '</div>' +
+          '<div style="font-size:15px">' + esc(p.location || "") + '</div>' +
+          (p.care ? '<div style="font-size:14px;color:#6b6154;margin-top:8px">保健：' + esc(p.care) + '</div>' : '') +
+          (q ? '<div class="quote"><b>今日经句</b>（' + esc(q.src) + '）<br>' + esc(q.original) + '</div>' : '') +
+          '<div style="margin-top:16px"><a class="btn" href="#/point/' + esc(p.id) + '">细读此穴</a></div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="card"><h3>打卡</h3><div class="wall-title">近十五周 · 每格一天 · 越深学得越多</div>' +
+          '<div class="wall">' + cells + '</div></div>' +
+          '<div class="card"><h3>继续学习</h3>' +
+            '<div style="font-size:14px;line-height:2.3">' +
+            '<span class="tag moss">理论</span><a href="#/theory">理论五课</a>——经络、腧穴、刺灸安全、特定穴、自我保健<br>' +
+            '<span class="tag moss">穴位</span><a href="#/meridians">经络穴位</a>——十四经木刻图与' + allPoints().filter(function (p) { return p.detailed; }).length + '个精讲穴<br>' +
+            '<span class="tag moss">经典</span><a href="#/classics">经典诵读</a>——《灵枢》十一篇与《难经》九难<br>' +
+            '<span class="tag moss">检索</span><a href="#/search">全文搜索</a>——按穴名、症名、条文查</div>' +
+          '</div>' +
+        '</div>' +
+      '</div></div>';
+  }
+
+  /* ---------- 理论 ---------- */
+  function theoryView(courseId) {
+    var courses = window.THEORY || [];
+    if (courseId) {
+      var c = courses.find(function (x) { return x.id === courseId; });
+      if (!c) return '<div class="empty">未找到该课程</div>';
+      var body = chapterSections(c).map(function (s, i) {
+        var paras = String(s.body).split("\n\n").map(function (t) { return "<p>" + t + "</p>"; }).join("");
+        return '<h2 class="sec">' + esc(s.h) + '</h2><div class="theory-body">' + paras + '</div>' +
+          readToggleHtml(c.id + "#" + i);
+      }).join("");
+      return '<div class="page">' +
+        '<div class="crumb"><a href="#/theory">理论</a> / ' + esc(c.title) + '</div>' +
+        '<div class="page-title">' + esc(c.title) + '</div>' +
+        '<div class="page-sub">第 ' + c.order + ' 课 · 学完一节点「已读」，打卡自动记录</div>' + body + '</div>';
+    }
+    var items = courses.slice().sort(function (a, b) { return a.order - b.order; }).map(function (c) {
+      var secs = chapterSections(c);
+      var done = secs.filter(function (s) { return Store.isRead(s.secId); }).length;
+      return '<div class="toc-item" onclick="location.hash=\'#/theory/' + esc(c.id) + '\'">' +
+        '<div><div class="t">' + esc(c.title) + '</div><div class="d">' + secs.length + ' 节 · 已读 ' + done + '</div></div>' +
+        '<div class="d">' + (done === secs.length ? "✓ 完成" : "") + '</div></div>';
+    }).join("");
+    return '<div class="page"><div class="page-title">理论<span class="zh-dot"> · </span>五课入门</div>' +
+      '<div class="page-sub">零基础从这里开始 · <span class="src">先懂道理，再认穴位，最后谈针</span></div>' + items + '</div>';
+  }
+
+  /* ---------- 经络穴位 ---------- */
+  function meridiansView() {
+    var cards = (window.MERIDIAN_INDEX || []).map(function (m) {
+      var abbr = m.abbr;
+      var done = allPoints().filter(function (p) { return p.meridian === m.meridian && p.detailed && Store.isRead(p.id); }).length;
+      var det = allPoints().filter(function (p) { return p.meridian === m.meridian && p.detailed; }).length;
+      return '<div class="mer-card" onclick="location.hash=\'#/meridian/' + abbr + '\'">' +
+        (MER_HAS_IMG[abbr]
+          ? '<img src="assets/img/mer-' + abbr + '.jpg" alt="' + esc(m.meridian) + '木刻经络图" loading="lazy">'
+          : '<div class="mer-ph">奇穴无古籍图 · 以穴会友</div>') +
+        '<div class="nm">' + esc(m.meridian) + '</div><div class="ct">' + m.points.length + ' 穴 · 精讲 ' + det + (det ? ' · 已读 ' + done : '') + '</div></div>';
+    }).join("");
+    return '<div class="page"><div class="page-title">经络<span class="zh-dot"> · </span>十四经与奇穴</div>' +
+      '<div class="page-sub">图为 Wellcome 藏古籍木刻经络图（CC BY 4.0） · <span class="src">点开一经，先看图，再认穴；经外奇穴不属十四经，故无图</span></div>' +
+      '<div class="mer-grid">' + cards + '</div></div>';
+  }
+
+  function meridianView(abbr) {
+    var name = MER_NAME[abbr];
+    var idx = (window.MERIDIAN_INDEX || []).find(function (m) { return m.abbr === abbr; });
+    if (!name || !idx) return '<div class="empty">未找到经脉</div>';
+    var detailed = allPoints().filter(function (p) { return p.meridian === name && p.detailed; });
+    var detIds = {}; detailed.forEach(function (p) { detIds[p.id] = 1; });
+    var chips = idx.points.map(function (nm) {
+      var p = allPoints().find(function (x) { return x.meridian === name && x.name === nm; });
+      if (p) return '<div class="point-chip" onclick="location.hash=\'#/point/' + esc(p.id) + '\'">' +
+        '<span>' + esc(p.name) + (Store.isRead(p.id) ? ' <span class="read-mark">◉</span>' : '') + '</span><span class="pid">' + esc(p.id) + '</span></div>';
+      return '<div class="point-chip brief"><span>' + esc(nm) + '</span><span class="pid">速查</span></div>';
+    }).join("");
+    return '<div class="page">' +
+      '<div class="crumb"><a href="#/meridians">经络穴位</a> / ' + esc(name) + '</div>' +
+      (MER_HAS_IMG[abbr]
+        ? '<div class="mer-image"><img src="assets/img/mer-' + esc(abbr) + '.jpg" alt="' + esc(name) + '木刻图">' +
+          '<div class="cap">' + esc(name) + ' · 古籍木刻图（Wellcome 藏，CC BY 4.0）</div></div>'
+        : '<div class="mer-image"><div class="mer-ph-big">经外奇穴 · 不属十四经，故无古籍经络图</div></div>') +
+      '<div class="page-title">' + esc(name) + '</div>' +
+      '<div class="page-sub">共 ' + idx.points.length + ' 穴 · 精讲 ' + detailed.length + ' 穴 · <span class="src">「速查」为全名单，暂无详解</span></div>' +
+      '<div class="point-list">' + chips + '</div></div>';
+  }
+
+  function pointView(id) {
+    var p = pointMap[id];
+    if (!p) return '<div class="empty">未找到穴位</div>';
+    var abbr = MER_ABBR[p.meridian];
+    /* 同经精讲穴内上一穴/下一穴 */
+    var siblings = allPoints().filter(function (x) { return x.meridian === p.meridian && x.detailed; });
+    var si = siblings.findIndex(function (x) { return x.id === p.id; });
+    var prev = si > 0 ? siblings[si - 1] : null;
+    var next = si < siblings.length - 1 ? siblings[si + 1] : null;
+    var nav = (prev || next) ? '<div class="pn-nav">' +
+      (prev ? '<a class="pn-btn" href="#/point/' + esc(prev.id) + '">← 上一穴 ' + esc(prev.name) + '</a>' : '<span class="pn-btn ghost2"></span>') +
+      (next ? '<a class="pn-btn" href="#/point/' + esc(next.id) + '">' + esc(next.name) + ' 下一穴 →</a>' : '<span class="pn-btn ghost2"></span>') +
+      '</div>' : '';
+    return '<div class="page">' +
+      '<div class="crumb"><a href="#/meridians">经络穴位</a> / <a href="#/meridian/' + esc(abbr) + '">' + esc(p.meridian) + '</a> / ' + esc(p.name) + '</div>' +
+      '<div class="point-head"><div class="big">' + esc(p.name) + '</div>' +
+        '<div><div style="font-size:14px;color:#6b6154">' + esc(p.pinyin) + '</div>' +
+        '<div style="margin-top:6px">' + readToggleHtml(p.id) + '</div></div></div>' +
+      '<div style="margin:8px 0 18px"><span class="tag">' + esc(p.meridian) + '</span>' +
+        (p.special ? '<span class="tag moss">' + esc(p.special) + '</span>' : '') +
+        '<span class="tag">' + esc(p.id) + '</span></div>' +
+      (p.caution ? '<div class="warn">⚠ ' + esc(p.caution) + '</div>' : '') +
+      '<div class="field"><div class="fl">定位</div><div>' + esc(p.location || "") + '</div></div>' +
+      '<div class="field"><div class="fl">主治</div><div class="indications">' +
+        (p.indications || []).map(function (x) { return '<span>' + esc(x) + '</span>'; }).join("") + '</div></div>' +
+      (p.care ? '<div class="field"><div class="fl">居家保健用法</div><div>' + esc(p.care) + '</div></div>' : '') +
+      (p.classic ? '<div class="field"><div class="fl">经典出处</div><div class="classic-quote">' + esc(p.classic) + '</div></div>' : '') +
+      noteBoxHtml(p.id) + nav + '</div>';
+  }
+
+  /* ---------- 经典诵读 ---------- */
+  function classicsView() {
+    var items = allChapters().map(function (c) {
+      var secs = chapterSections(c);
+      var done = secs.filter(function (s) { return Store.isRead(s.secId); }).length;
+      return '<div class="toc-item" onclick="location.hash=\'#/classic/' + esc(c.id) + '\'">' +
+        '<div><div class="t">' + esc(c.title) + (Store.recitedToday(c.id) ? ' <span class="recite-dot" title="今日已诵">诵</span>' : '') + '</div><div class="d">' + esc(c.source) + (c.note ? ' · ' + esc(c.note) : '') + '</div></div>' +
+        '<div class="d">' + done + ' / ' + secs.length + '</div></div>';
+    }).join("");
+    var recited = Store.recitedTodayCount();
+    return '<div class="page"><div class="page-title">经典诵读<span class="zh-dot"> · </span>针灸之源</div>' +
+      '<div class="page-sub">' + (recited ? '今日已诵 ' + recited + ' 篇 · ' : '') + '《灵枢》为针灸之源，《难经》申其穴法 · <span class="src">译文为 AI 参考译文；读毕可在篇内盖「今日已诵」印</span></div>' + items + '</div>';
+  }
+
+  function debateHtml(d) {
+    if (!d || !d.schools || !d.schools.length) return "";
+    return '<div class="debate"><div class="db-title">笺注 · 注家分歧</div>' +
+      '<div class="quote-line">「' + esc(d.quote) + '」</div>' +
+      d.schools.map(function (s) {
+        return '<div class="school"><span class="who">' + esc(s.commentator) + '</span> <span class="work">' + esc(s.work || "") + '</span><br>' + esc(s.view) + '</div>';
+      }).join("") + '</div>';
+  }
+  function casesHtml(cases) {
+    if (!cases || !cases.length) return "";
+    return cases.map(function (c) {
+      return '<div class="case"><div class="cs-title">医案对账</div>' + esc(c.text) +
+        '<div class="src">—— ' + esc(c.source) + (c.takeaway ? ' · 启示：' + esc(c.takeaway) : '') + '</div></div>';
+    }).join("");
+  }
+
+  function classicView(chId) {
+    var c = chapterMap[chId];
+    if (!c) return '<div class="empty">未找到篇章</div>';
+    var chapters = allChapters();
+    var ci = chapters.findIndex(function (x) { return x.id === chId; });
+    var prevC = ci > 0 ? chapters[ci - 1] : null;
+    var nextC = ci < chapters.length - 1 ? chapters[ci + 1] : null;
+    var nav = '<div class="pn-nav">' +
+      (prevC ? '<a class="pn-btn" href="#/classic/' + esc(prevC.id) + '">← ' + esc(prevC.title) + '</a>' : '<span class="pn-btn ghost2"></span>') +
+      (nextC ? '<a class="pn-btn" href="#/classic/' + esc(nextC.id) + '">' + esc(nextC.title) + ' →</a>' : '<span class="pn-btn ghost2"></span>') +
+      '</div>';
+    var secs = chapterSections(c);
+    var body = secs.map(function (s, i) {
+      return '<div class="section-item card">' +
+        '<div class="original"><span class="sec-no">' + esc(s.label || (i + 1)) + '</span>' + esc(s.original) + '</div>' +
+        (s.translation ? '<div class="translation"><span class="tt">AI 参考译文</span><br>' + esc(stripPrefix(s.translation)) + '</div>' : '') +
+        (s.keynotes ? '<div class="keynote"><b>零基础要点</b> · ' + esc(stripPrefix(s.keynotes)) + '</div>' : '') +
+        debateHtml(s.debate) + casesHtml(s.cases) +
+        '<div style="text-align:right">' + readToggleHtml(s.secId) + '</div></div>';
+    }).join("");
+    return '<div class="page">' +
+      '<div class="crumb"><a href="#/classics">经典诵读</a> / ' + esc(c.title) + '</div>' +
+      '<div class="page-title">' + esc(c.title) + (Store.recitedToday(c.id) ? ' <span class="recite-seal">今日已诵</span>' : '') + '</div>' +
+      '<div class="page-sub">' + esc(c.source) + (c.note ? ' · ' + esc(c.note) : '') + '</div>' +
+      (Store.recitedToday(c.id) ? '' :
+        '<div style="margin:0 0 14px"><button class="btn" onclick="App.reciteDone(\'' + esc(c.id) + '\')">诵毕打卡 ✓ 记今日诵读</button>' +
+        '<span class="src" style="margin-left:10px">朗读一遍后点此，计入今日打卡</span></div>') +
+      body + nav + '</div>';
+  }
+
+  /* ---------- 穴位自测 ---------- */
+  var quizCur = null, quizRevealed = false, quizMeta = { reviewing: false, overdue: 0, dueTotal: 0 };
+  function drawQuizPoint() {
+    var detailed = allPoints().filter(function (p) { return p.detailed; });
+    var pick = null, reviewing = false, overdue = 0;
+    var due = Store.quizDue();
+    if (due.length) { // SRS：到期卡最优先，最久超期先出
+      pick = pointMap[due[0].id]; reviewing = true; overdue = due[0].overdue;
+    }
+    if (!pick) { // 无到期卡：40% 概率抽薄弱穴
+      var weak = Store.quizStats().weak.map(function (w) { return w.id; });
+      if (weak.length && Math.random() < 0.4) pick = pointMap[weak[Math.floor(Math.random() * weak.length)]];
+    }
+    if (!pick) { // 兼底：随机新卡
+      var pool = detailed.filter(function (p) { return !quizCur || p.id !== quizCur.id; });
+      pick = pool[Math.floor(Math.random() * pool.length)];
+    }
+    quizCur = pick; quizRevealed = false;
+    quizMeta = { reviewing: reviewing, overdue: overdue, dueTotal: due.length };
+    return pick;
+  }
+  function quizCardHtml(p) {
+    var q = Store.getQuiz(p.id);
+    return '<div class="quiz-card" id="quiz-card">' +
+      '<div class="q-head"><span class="tag">' + esc(p.meridian) + '</span>' +
+        (p.special ? '<span class="tag moss">' + esc(p.special) + '</span>' : '') +
+        (quizMeta.reviewing ? '<span class="tag moss">SRS 复习' + (quizMeta.overdue > 0 ? ' · 超' + quizMeta.overdue + ' 天' : '') + '</span>' : '') +
+        '<span class="q-rec">答对 ' + q.r + ' · 记错 ' + q.w + (quizMeta.reviewing ? ' · 待复习 ' + quizMeta.dueTotal : '') + '</span></div>' +
+      '<div class="q-name">' + esc(p.name) + '</div>' +
+      '<div class="q-py">' + esc(p.pinyin) + '</div>' +
+      '<div class="q-tip">先默背定位与主治，再翻面对照</div>' +
+      '<div class="q-answer" id="quiz-answer" style="display:none">' +
+        '<div class="field"><div class="fl">定位</div><div>' + esc(p.location || "") + '</div></div>' +
+        '<div class="field"><div class="fl">主治</div><div class="indications">' +
+          (p.indications || []).map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div></div>' +
+        (p.care ? '<div class="field"><div class="fl">居家保健</div><div>' + esc(p.care) + '</div></div>' : '') +
+      '</div>' +
+      '<div class="q-actions" id="quiz-actions">' +
+        (!quizRevealed ? '<button class="btn" onclick="App.quizFlip()">翻面对照</button>' : '') +
+      '</div>' +
+      '</div>';
+  }
+  function quizView() {
+    quizRevealed = false;
+    drawQuizPoint();
+    var st = Store.quizStats();
+    var rate = st.total ? Math.round(st.right / st.total * 100) : null;
+    var weak = st.weak.slice(0, 8).map(function (w) {
+      return '<a class="weak-chip" href="#/point/' + esc(w.id) + '">' + esc(pointMap[w.id].name) + ' <span>' + w.r + '/' + (w.r + w.w) + '</span></a>';
+    }).join('');
+    return '<div class="page"><div class="page-title">自测<span class="zh-dot"> · </span>认穴</div>' +
+      '<div class="page-sub">' + (quizMeta.dueTotal ? '今日待复习 ' + quizMeta.dueTotal + ' 穴（已优先安排） · ' : '') + '随机抽精讲穴 · ' +
+      '<span class="src">SRS 间隔复习：答对按 1/3/7/16/35 天拉长间隔，答错回炉；答题计入当日打卡</span></div>' +
+      '<div class="quiz-stats">累计 ' + st.total + ' 题' + (rate !== null ? ' · 正确率 ' + rate + '%' : ' · 还没答过题') +
+        (st.total ? ' <button class="btn ghost" style="margin-left:10px" onclick="App.quizReset()">清零记录</button>' : '') + '</div>' +
+      (weak ? '<div class="weak-row"><span class="fl" style="margin-right:8px">薄弱穴</span>' + weak + '</div>' : '') +
+      '<div id="quiz-area">' + quizCardHtml(quizCur) + '</div></div>';
+  }
+
+  /* ---------- 搜索 ---------- */
+  var searchIndex = [];
+  function buildIndex() {
+    searchIndex = [];
+    (window.THEORY || []).forEach(function (c) {
+      chapterSections(c).forEach(function (s, i) {
+        searchIndex.push({ cat: "理论", title: c.title + " · " + s.h, url: "#/theory/" + c.id, text: String(s.body), readId: c.id + "#" + i });
+      });
+    });
+    allPoints().forEach(function (p) {
+      if (!p.detailed) return;
+      searchIndex.push({ cat: "穴位", title: p.name + " " + p.pinyin, url: "#/point/" + p.id,
+        text: [p.meridian, p.special, p.location, p.care, (p.indications || []).join(" ")].join(" "), readId: p.id });
+    });
+    allChapters().forEach(function (c) {
+      chapterSections(c).forEach(function (s, i) {
+        searchIndex.push({ cat: "经典", title: c.title + " · " + (s.label || i + 1), url: "#/classic/" + c.id,
+          text: [s.original, s.translation, s.keynotes].join(" "), readId: s.secId });
+      });
+    });
+  }
+  function searchView(q) {
+    q = (q || "").trim();
+    var hits = [];
+    if (q) {
+      var ql = q.toLowerCase();
+      searchIndex.forEach(function (e) {
+        var tl = e.title.toLowerCase(), xl = e.text.toLowerCase();
+        var pos = xl.indexOf(ql);
+        if (tl.indexOf(ql) >= 0 || pos >= 0) {
+          var snippet = pos >= 0 ? e.text.slice(Math.max(0, pos - 24), pos + 56) : e.text.slice(0, 80);
+          hits.push({ e: e, titleHit: tl.indexOf(ql) >= 0, snippet: snippet });
+        }
+      });
+      hits.sort(function (a, b) { return (b.titleHit ? 1 : 0) - (a.titleHit ? 1 : 0); });
+      if (hits.length > 60) hits = hits.slice(0, 60);
+    }
+    var em = new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "g");
+    var html = '<div class="page"><div class="page-title">搜索<span class="zh-dot"> · </span>全文</div>' +
+      '<div style="margin-bottom:20px"><input class="search-input-big" id="search-big" value="' + esc(q) + '" placeholder="试：足三里 / 失眠 / 迎随 / 头痛…"></div>';
+    if (!q) return html + '<div class="empty">输入关键词，搜穴位、条文、理论</div></div>';
+    html += '<div class="page-sub">找到 ' + hits.length + ' 条相关内容</div>';
+    hits.forEach(function (h) {
+      var sn = esc(h.snippet).replace(em, "<em>$1</em>");
+      html += '<div class="hit" onclick="location.hash=\'' + h.e.url + '\'">' +
+        '<div class="ht"><span class="cat">' + h.e.cat + '</span>' + esc(h.e.title) + '</div>' +
+        '<div class="hx">…' + sn + '…</div></div>';
+    });
+    return html + '</div>';
+  }
+
+  /* ---------- 笔记 ---------- */
+  function notesView() {
+    var notes = Store.raw().notes, keys = Object.keys(notes);
+    if (!keys.length) return '<div class="page"><div class="page-title">朱批<span class="zh-dot"> · </span>笔记</div>' +
+      '<div class="empty">还没有笔记。在穴位或条文页写下第一条吧。</div></div>';
+    function linkFor(id) {
+      if (pointMap[id]) return '<a href="#/point/' + esc(id) + '">' + esc(pointMap[id].name) + '</a>';
+      if (id.indexOf("#") >= 0) {
+        var cid = id.split("#")[0], c = chapterMap[cid], th = (window.THEORY || []).find(function (t) { return t.id === cid; });
+        if (c) return '<a href="#/classic/' + esc(cid) + '">' + esc(c.title) + '</a>';
+        if (th) return '<a href="#/theory/' + esc(cid) + '">' + esc(th.title) + '</a>';
+      }
+      return esc(id);
+    }
+    var items = keys.map(function (k) {
+      return '<div class="card"><div class="meta">' + linkFor(k) + '</div>' +
+        '<div style="margin-top:6px;font-size:15px">' + esc(notes[k]) + '</div>' +
+        '<div style="margin-top:8px"><button class="btn ghost" onclick="App.editNoteFromList(\'' + k + '\')">去修改</button> ' +
+        '<button class="btn ghost" onclick="App.deleteNote(\'' + k + '\')">删除</button></div></div>';
+    }).join("");
+    return '<div class="page"><div class="page-title">朱批<span class="zh-dot"> · </span>笔记</div>' +
+      '<div class="page-sub">共 ' + keys.length + ' 条</div>' + items + '</div>';
+  }
+
+  /* ---------- 备份 ---------- */
+  function backupView() {
+    return '<div class="page"><div class="page-title">备份<span class="zh-dot"> · </span>数据</div>' +
+      '<div class="page-sub">学习进度、笔记、打卡都存在本浏览器里 · <span class="src">换电脑或清缓存前请先导出</span></div>' +
+      '<div class="card"><h3>导出</h3><div style="font-size:14px;color:#6b6154">把全部学习数据存成一个 JSON 文件。</div>' +
+        '<div style="margin-top:10px"><button class="btn" onclick="App.exportData()">导出 JSON 备份</button></div></div>' +
+      '<div class="card"><h3>导入</h3><div style="font-size:14px;color:#6b6154">选择之前导出的备份文件，<strong style="color:#7e2b1e">将覆盖</strong>当前数据。</div>' +
+        '<div style="margin-top:10px"><input type="file" id="import-file" accept=".json" onchange="App.importData(this)"></div></div>' +
+      '<div class="card"><h3>二维码接力</h3><div style="font-size:14px;color:#6b6154">电脑出码、手机扫，数据不经网盘、不出本机。大备份会自动分段，请<strong>逐段扫描</strong>；扫满段数自动拼装。</div>' +
+        '<div style="margin-top:10px"><button class="btn" onclick="App.qrExportStart()">出码（本机数据）</button> ' +
+        '<button class="btn" onclick="App.qrImportStart()">扫码导入</button></div>' +
+        '<div id="qr-export" style="display:none;margin-top:14px"></div>' +
+        '<div id="qr-import" style="display:none;margin-top:14px"></div></div>' +
+      '<div class="card"><h3>危险区</h3><div style="font-size:14px;color:#6b6154">清空全部学习数据，不可恢复。</div>' +
+        '<div style="margin-top:10px"><button class="btn ghost" onclick="App.clearAll()">清空全部数据</button></div></div>' +
+      '<div class="card"><h3>图片来源</h3><div style="font-size:13px;color:#6b6154">经络木刻图取自 Wikimedia Commons（Wellcome Collection，CC BY 4.0）。经典原文供诵读学习，译文与注解仅供参考，最终以原典与师授为准。</div></div>' +
+      '</div>';
+  }
+
+  /* ---------- 对比卡组 ---------- */
+  var cmpMasked = {}; // groupId -> bool（自测模式：遮住定位与主治）
+  var cmpOpen = {};   // groupId|序号 -> bool（逐卡揭示）
+  function compareView() {
+    var groups = window.COMPARE_GROUPS || [];
+    var html = groups.map(function (g) {
+      var masked = !!cmpMasked[g.id];
+      var cards = (g.ids || []).map(function (pid, i) {
+        var p = pointMap[pid];
+        if (!p) return "";
+        var hidden = masked && !cmpOpen[g.id + "|" + i];
+        return '<div class="cv-card' + (hidden ? " masked" : "") + '" ' +
+          (hidden ? 'onclick="App.cmpFlip(\'' + g.id + '|' + i + '\')"' : '') + '>' +
+          '<div class="nm">' + esc(p.name) + '</div><div class="py">' + esc(p.pinyin) + ' · ' + esc(p.id) + '</div>' +
+          '<div class="mer">' + esc(p.meridian) + (p.special && p.special !== "无" ? ' · ' + esc(p.special) : '') + '</div>' +
+          (hidden
+            ? '<div class="cv-hidden">定位与主治已遮住<br>点我对照</div>'
+            : '<div class="loc">' + esc(p.location) + '</div>' +
+              '<div class="ind">主治：' + esc((p.indications || []).join("、")) + '</div>') +
+          '</div>';
+      }).join("");
+      return '<div class="card cmp-group"><h3>' + esc(g.title) +
+        '<span class="src" style="margin-left:10px;font-weight:normal">' + (masked ? "自测中 · 点击卡片揭示" : "") + '</span>' +
+        '<button class="btn ghost" style="float:right" onclick="App.cmpMask(\'' + g.id + '\')">' + (masked ? "退出自测" : "自测模式") + '</button></h3>' +
+        '<div class="cv-intro">' + esc(g.intro) + '</div>' +
+        '<div class="cv-grid">' + cards + '</div>' +
+        '<div class="cv-tip"><b>记忆抓手</b> · ' + esc(g.tip) + '</div></div>';
+    }).join("");
+    return '<div class="page"><div class="page-title">对比<span class="zh-dot"> · </span>卡组</div>' +
+      '<div class="page-sub">易混穴摆在一起记，比单个记牢 · <span class="src">开「自测模式」先回忆定位主治，再点卡对照</span></div>' + html + '</div>';
+  }
+
+  /* ---------- 循经点穴 ---------- */
+  var pw = null; // 会话：{abbr, order:[正确序列], cand:[待点乱序], next, errs, done}
+  function pwShuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function pwStart(abbr) {
+    var idx = (window.MERIDIAN_INDEX || []).find(function (m) { return m.abbr === abbr; });
+    if (!idx) { pw = null; return; }
+    pw = { abbr: abbr, order: idx.points.slice(), cand: pwShuffle(idx.points.slice()), next: 0, errs: 0, done: false, lastMiss: "" };
+  }
+  function pwPickList() {
+    var cards = (window.MERIDIAN_INDEX || []).filter(function (m) { return m.abbr !== "EX"; }).map(function (m) {
+      var doneToday = Store.pwDoneToday(m.abbr);
+      var errs = Store.pwErrsToday(m.abbr);
+      return '<div class="mer-card" onclick="location.hash=\'#/pathway/' + m.abbr + '\'">' +
+        '<div class="pw-mer">' + esc(m.meridian) + '</div>' +
+        '<div class="ct">' + m.points.length + ' 穴 · ' +
+        (doneToday ? '<span class="pw-ok">今日已过 · 错 ' + errs + ' 次</span>' : '点开始挑战') + '</div></div>';
+    }).join("");
+    return '<div class="page"><div class="page-title">循经<span class="zh-dot"> · </span>点穴</div>' +
+      '<div class="page-sub">把一条经的穴按流注顺序点出来 · <span class="src">经脉流注本身是最好的记忆结构；当日首次通关记一笔打卡</span></div>' +
+      '<div class="mer-grid">' + cards + '</div></div>';
+  }
+  function pwAreaHtml() {
+    if (!pw || pw.done) return "";
+    var idx = (window.MERIDIAN_INDEX || []).find(function (m) { return m.abbr === pw.abbr; });
+    var N = idx.points.length;
+    var slots = "";
+    for (var i = 0; i < N; i++) {
+      slots += i < pw.next
+        ? '<div class="pw-slot locked"><span class="no">' + (i + 1) + '</span>' + esc(pw.order[i]) + '</div>'
+        : '<div class="pw-slot"><span class="no">' + (i + 1) + '</span><span class="q">?</span></div>';
+    }
+    var pool = pw.cand.map(function (nm) {
+      return '<button class="btn ghost pw-chip' + (pw.lastMiss === nm ? " miss" : "") + '" id="pw-' + esc(nm) + '" onclick="App.pwPick(\'' + esc(nm) + '\')">' + esc(nm) + '</button>';
+    }).join("");
+    return '<div class="pw-progress">已点 <b>' + pw.next + '</b> / ' + N + ' · 错 ' + pw.errs + ' 次' +
+      ' <button class="btn ghost" style="margin-left:10px" onclick="App.pwReset()">重新洗牌</button></div>' +
+      '<div class="pw-slots">' + slots + '</div>' +
+      '<div class="pw-pool">' + pool + '</div>';
+  }
+  function pathwayView(abbr) {
+    if (!abbr) return pwPickList();
+    var idx = (window.MERIDIAN_INDEX || []).find(function (m) { return m.abbr === abbr; });
+    if (!idx) return pwPickList();
+    if (!pw || pw.abbr !== abbr) pwStart(abbr); // 换经/首次进入才洗牌，route 重绘不打乱进度
+    var doneHtml = pw.done
+      ? '<div class="pw-done">通关！本经 ' + pw.order.length + ' 穴全数点到 · 错 ' + pw.errs + ' 次' +
+        (Store.pwDoneToday(abbr) ? ' <span class="pw-ok">今日已记打卡</span>' : '') +
+        ' <button class="btn" onclick="App.pwReset()">再练一遍</button></div>' : "";
+    return '<div class="page">' +
+      '<div class="crumb"><a href="#/pathway">循经点穴</a> / ' + esc(idx.meridian) + '</div>' +
+      '<div class="page-title">' + esc(idx.meridian) + '<span class="zh-dot"> · </span>点穴</div>' +
+      '<div class="page-sub">共 ' + idx.points.length + ' 穴 · <span class="src">按经脉流注顺序点出下面的穴，点错会计数但不提示哪个对</span></div>' +
+      (pw.done ? doneHtml : '') +
+      '<div id="pw-area">' + pwAreaHtml() + '</div></div>';
+  }
+
+  /* ---------- 医案库 ---------- */
+  var casesChapter = "", casesQ = "";
+  function collectCases() {
+    var out = [];
+    allChapters().forEach(function (c) {
+      chapterSections(c).forEach(function (s) {
+        (s.cases || []).forEach(function (cs) {
+          out.push({ text: cs.text, source: cs.source || "", takeaway: cs.takeaway || "",
+            chId: c.id, chTitle: c.title, label: s.label || "" });
+        });
+      });
+    });
+    return out;
+  }
+  function casesView() {
+    var all = collectCases();
+    var chs = [];
+    all.forEach(function (c) { if (chs.indexOf(c.chTitle) < 0) chs.push(c.chTitle); });
+    var q = casesQ.trim().toLowerCase();
+    var list = all.filter(function (c) {
+      if (casesChapter && c.chTitle !== casesChapter) return false;
+      if (q && (c.text + " " + c.source + " " + c.takeaway).toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+    var chips = ['<button class="read-toggle' + (casesChapter ? "" : " on") + '" onclick="App.casesFilter(\'\', \'\')">全部 ' + all.length + '</button>']
+      .concat(chs.map(function (t) {
+        var n = all.filter(function (c) { return c.chTitle === t; }).length;
+        return '<button class="read-toggle' + (casesChapter === t ? " on" : "") + '" onclick="App.casesFilter(\'' + esc(t) + '\', \'\')">' + esc(t) + ' ' + n + '</button>';
+      })).join("");
+    var cards = list.map(function (c) {
+      return '<div class="case" style="margin-bottom:14px"><div class="cs-title">' + esc(c.chTitle) + (c.label ? ' · ' + esc(c.label) : '') + '</div>' +
+        esc(c.text) +
+        '<div class="src">—— ' + esc(c.source) + (c.takeaway ? ' · 启示：' + esc(c.takeaway) : '') + '</div>' +
+        '<div style="margin-top:8px"><a class="btn ghost" href="#/classic/' + esc(c.chId) + '">回到原文语境 →</a></div></div>';
+    }).join("");
+    return '<div class="page"><div class="page-title">医案<span class="zh-dot"> · </span>对账库</div>' +
+      '<div class="page-sub">散在经典条文下的真实医案汇总于此 · <span class="src">全部注明出处，学理以医案验证——「读经不验案，如观图不渡」</span></div>' +
+      '<div style="margin-bottom:12px"><input class="search-input-big" id="cases-q" value="' + esc(casesQ) + '" placeholder="按病症/人物/书名搜，如：头风 / 华佗 / 龋齿"></div>' +
+      '<div style="margin-bottom:16px">' + chips + '</div>' +
+      (list.length ? cards : '<div class="empty">没有命中的医案</div>') + '</div>';
+  }
+
+  /* ---------- 导出 ---------- */
+  window.Views = {
+    home: homeView, theory: theoryView, meridians: meridiansView, meridian: meridianView,
+    point: pointView, classics: classicsView, classic: classicView, search: searchView,
+    notes: notesView, backup: backupView, buildIndex: buildIndex, quiz: quizView,
+    compare: compareView, pathway: pathwayView, cases: casesView,
+    helpers: { esc: esc, MER_ABBR: MER_ABBR, allPoints: allPoints, pointMap: pointMap, chapterMap: chapterMap }
+  };
+
+  /* 局部重绘下一题（供 App 调用）；返回当前题穴 id */
+  window.Views.quizDraw = function (container) {
+    drawQuizPoint();
+    if (container) container.innerHTML = quizCardHtml(quizCur);
+    return quizCur ? quizCur.id : null;
+  };
+  window.Views.quizCurrentId = function () { return quizCur ? quizCur.id : null; };
+
+  /* 医案库筛选状态（供 App 调用） */
+  window.Views.casesFilter = function (ch, q) { casesChapter = ch; casesQ = q || ""; };
+  window.Views.casesCurrentChapter = function () { return casesChapter; };
+
+  /* 局部重绘点穴区（供 App.pwPick/pwReset 调用，避免整页重绘丢失节奏） */
+  window.Views.pwArea = function () { return pwAreaHtml(); };
+
+  /* ---- 卡组/点穴的状态变更（供 App 调用） ---- */
+  window.Views.cmpMaskToggle = function (gid) {
+    cmpMasked[gid] = !cmpMasked[gid];
+    if (!cmpMasked[gid]) {
+      Object.keys(cmpOpen).forEach(function (k) { if (k.indexOf(gid + "|") === 0) delete cmpOpen[k]; });
+    }
+  };
+  window.Views.cmpReveal = function (key) { cmpOpen[key] = !cmpOpen[key]; };
+  window.Views.pwGuess = function (name) {
+    if (!pw || pw.done) return "";
+    if (name === pw.order[pw.next]) {
+      pw.next++;
+      pw.cand = pw.cand.filter(function (n) { return n !== name; });
+      pw.lastMiss = "";
+      if (pw.next >= pw.order.length) {
+        pw.done = true;
+        Store.pwDone(pw.abbr, pw.errs); // 当日首次通关记一笔打卡
+      }
+      return "";
+    }
+    pw.errs++;
+    pw.lastMiss = name;
+    return name;
+  };
+  window.Views.pwFinished = function () { return !!pw && pw.done; };
+  window.Views.pwRestart = function () { if (pw) pwStart(pw.abbr); };
+})();

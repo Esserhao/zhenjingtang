@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>针经堂 · 针灸自学</title>
+<!--
+  针经堂 —— 个人针灸自学网站（纯静态，双击即开）
+  ┌ 假设清单 ────────────────────────────────────────────
+  │ 1. 自用本地站，无后端；学习数据存 localStorage，可导出/导入 JSON
+  │ 2. 经典译文为 AI 参考译文，页面如实标注；注家分歧与医案只收有出处者
+  │ 3. 古籍经络图取自 Wikimedia（Wellcome 藏木刻图，CC BY 4.0），见 assets/img/CREDITS.md
+  └──────────────────────────────────────────────────────
+  路由（hash）：#/home #/theory #/meridians #/meridian/LU #/point/LU1
+               #/classics #/classic/ls-jzsey #/quiz #/search?q=… #/notes #/backup
+-->
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪡</text></svg>">
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar" aria-label="主导航">
+    <div class="brand" onclick="location.hash='#/home'">
+      <span class="brand-seal">针</span>
+      <span class="brand-name">针经堂</span>
+    </div>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="#/home" data-nav="home">首页</a>
+      <a class="nav-tab" href="#/theory" data-nav="theory">理论</a>
+      <a class="nav-tab" href="#/meridians" data-nav="meridians">经络穴位</a>
+      <a class="nav-tab" href="#/classics" data-nav="classics">经典诵读</a>
+      <a class="nav-tab" href="#/cases" data-nav="cases">医案</a>
+      <a class="nav-tab" href="#/compare" data-nav="compare">对比卡组</a>
+      <a class="nav-tab" href="#/pathway" data-nav="pathway">循经点穴</a>
+      <a class="nav-tab" href="#/quiz" data-nav="quiz">自测</a>
+      <a class="nav-tab" href="#/notes" data-nav="notes">笔记</a>
+      <a class="nav-tab" href="#/backup" data-nav="backup">备份</a>
+    </div>
+    <div class="sidebar-search">
+      <input id="global-search" type="search" placeholder="搜穴位 / 条文…" autocomplete="off">
+    </div>
+    <div class="sidebar-foot">
+      <div id="streak-chip" class="streak-chip" title="连续学习天数"></div>
+    </div>
+  </nav>
+  <main id="main" class="main"></main>
+</div>
+
+<!-- 数据层：内容与代码分离，改内容请读 data/SCHEMA.md -->
+<script src="data/acupoints-1.js"></script>
+<script src="data/acupoints-2.js"></script>
+<script src="data/acupoints-3.js"></script>
+<script src="data/meridian-index.js"></script>
+<script src="data/theory.js"></script>
+<script src="data/classics.js"></script>
+<script src="data/nanjing.js"></script>
+<script src="data/compare.js"></script>
+<script src="assets/vendor/qrcode.min.js"></script>
+<script src="assets/vendor/jsQR.min.js"></script>
+<!-- 应用层 -->
+<script src="js/store.js"></script>
+<script src="js/views.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
