@@ -5,12 +5,33 @@
   "use strict";
   var KEY = "zjsx_state_v1";
 
+  /* 一次性迁移：难经旧下标制 id（nj-group#0..8 → 16,45,62..68 难）改为稳定难次制（nj-group#n<num>）。
+     旧键其余数字（9+）不存在（当时只有 9 条），迁移幂等。 */
+  function migrateNanjingIds(s) {
+    var old2new = { "nj-group#0": "nj-group#n16", "nj-group#1": "nj-group#n45", "nj-group#2": "nj-group#n62",
+      "nj-group#3": "nj-group#n63", "nj-group#4": "nj-group#n64", "nj-group#5": "nj-group#n65",
+      "nj-group#6": "nj-group#n66", "nj-group#7": "nj-group#n67", "nj-group#8": "nj-group#n68" };
+    ["read", "notes"].forEach(function (field) {
+      var obj = s[field], changed = false;
+      Object.keys(old2new).forEach(function (oldKey) {
+        if (obj[oldKey] !== undefined) {
+          obj[old2new[oldKey]] = obj[oldKey];
+          delete obj[oldKey];
+          changed = true;
+        }
+      });
+      // 只改内存对象，state 建立后随下次操作统一落盘
+    });
+  }
+
   function load() {
     try {
       var raw = localStorage.getItem(KEY);
       if (raw) {
         var s = JSON.parse(raw);
-        return { read: s.read || {}, days: s.days || {}, notes: s.notes || {}, daily: s.daily || {}, quiz: s.quiz || {}, recite: s.recite || {}, pathway: s.pathway || {} };
+        s = { read: s.read || {}, days: s.days || {}, notes: s.notes || {}, daily: s.daily || {}, quiz: s.quiz || {}, recite: s.recite || {}, pathway: s.pathway || {} };
+        migrateNanjingIds(s);
+        return s;
       }
     } catch (e) { console.warn("状态读取失败，已重置", e); }
     return { read: {}, days: {}, notes: {}, daily: {}, quiz: {}, recite: {}, pathway: {} };

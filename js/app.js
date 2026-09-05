@@ -25,6 +25,7 @@
       case "compare": html = V.compare(); break;
       case "pathway": html = V.pathway(seg[1]); break;
       case "cases": html = V.cases(); break;
+      case "report": html = V.report(); break;
       case "backup": html = V.backup(); break;
       default: html = V.home();
     }
@@ -309,6 +310,10 @@
     casesFilter: function (ch, q) {
       var box = document.getElementById("cases-q");
       window.Views.casesFilter(ch, q != null ? q : (box ? box.value : ""));
+      route();
+    },
+    casesSym: function (t) {
+      window.Views.casesSetSym(t);
       route();
     }
   };

@@ -480,3 +480,33 @@ textarea.note-box:focus { border-color: var(--cinnabar); }
 }
 #qr-canvas { image-rendering: pixelated; border: 1px solid var(--line); border-radius: 3px; }
 #qr-video { border: 1px solid var(--line); }
+
+/* ---------- 周报 ---------- */
+.report-table {
+  width: 100%; border-collapse: collapse; margin-bottom: 18px;
+  background: #fbf7ec; border: 1px solid var(--line); font-size: 14px;
+}
+.report-table th, .report-table td {
+  border-bottom: 1px solid var(--line); padding: 8px 12px; text-align: left;
+}
+.report-table th {
+  font-family: var(--serif-kai); color: var(--cinnabar); letter-spacing: 2px;
+  font-weight: normal; border-bottom: 2px solid var(--cinnabar);
+}
+.report-table tr:last-child td { border-bottom: none; }
+.report-table td:first-child { font-family: var(--serif-kai); }
+/* 独立使用的字段标签（薄弱穴/病症行首） */
+.fl {
+  font-family: var(--serif-kai); color: var(--cinnabar); font-size: 14px; letter-spacing: 2px;
+}
+
+/* ---------- 打印：只留周报正文 ---------- */
+@media print {
+  body { background: #fff; }
+  .layout { display: block; }
+  .sidebar, .no-print, .pn-nav { display: none !important; }
+  .main { padding: 0; }
+  .page { max-width: 100%; }
+  .page-title { font-size: 24px; }
+  .card, .report-table { box-shadow: none; }
+}

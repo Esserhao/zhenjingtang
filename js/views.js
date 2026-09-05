@@ -20,14 +20,15 @@
   var pointMap = {};
   allPoints().forEach(function (p) { pointMap[p.id] = p; });
 
-  /* 难经归一为经典章节（每难一条 section） */
+  /* 难经归一为经典章节（每难一条 section，按难次排序）
+     secId 用稳定 id「nj-group#n<num>」；store.js 一次性把旧下标制（nj-group#0..8）迁移过来 */
   var nanjingChapters = [{
-    id: "nj-group", title: "难经 · 六十二难至六十八难", source: "《难经》",
-    note: "论五输穴与原穴、募穴——穴位理论的总纲，与《灵枢·本输》对照读",
-    sections: (window.NANJING || []).map(function (n, i) {
+    id: "nj-group", title: "难经 · 全八十一难", source: "《难经》",
+    note: "脉论经、脏论病、穴论俞、针法论刺——与《灵枢》互为表里",
+    sections: (window.NANJING || []).slice().sort(function (a, b) { return a.num - b.num; }).map(function (n) {
       return {
         label: "第" + n.num + "难", original: n.original, translation: n.translation,
-        keynotes: n.keynotes, debate: n.debate, cases: n.cases, secId: "nj-group#" + i
+        keynotes: n.keynotes, debate: n.debate, cases: n.cases, secId: "nj-group#n" + n.num
       };
     })
   }];
@@ -542,14 +543,43 @@
   }
 
   /* ---------- 医案库 ---------- */
-  var casesChapter = "", casesQ = "";
+  var casesChapter = "", casesQ = "", casesSym = "";
+  /* 病症维度：关键词表（按现有 12 案手工归纳，新案入库若涉及新病症需在此补关键词） */
+  var CASE_SYMS = [
+    { tag: "头风头痛", re: /头风|头痛|眩/ },
+    { tag: "齿牙痛", re: /龋|齿痛|齿/ },
+    { tag: "厥逆急救", re: /尸厥|厥|气绝/ },
+    { tag: "风痹不遂", re: /痹|风懿|不挽弓|偏枯/ },
+    { tag: "喘咳", re: /喘|咳/ },
+    { tag: "泄利", re: /溏|泄|利下|下利/ },
+  ];
+  /* 穴位维度：医案原文中提到的穴名（含古称）→ 本库穴位 id */
+  var CASE_POINTS = [
+    { names: ["三阳五会", "百会"], id: "GV20" },
+    { names: ["脑户"], id: "GV17" },
+    { names: ["肩髃", "肩隅"], id: "LI15" },
+    { names: ["肺俞"], id: "BL13" },
+    { names: ["脐中", "神阙"], id: "CV8" },
+    { names: ["鬲", "膈"], id: "BL17" },
+  ];
+  function caseSyms(c) {
+    var full = c.text + " " + c.takeaway;
+    return CASE_SYMS.filter(function (s) { return s.re.test(full); }).map(function (s) { return s.tag; });
+  }
+  function casePoints(c) {
+    return CASE_POINTS.filter(function (p) {
+      return p.names.some(function (n) { return c.text.indexOf(n) >= 0; }) && pointMap[p.id];
+    }).map(function (p) { return { name: pointMap[p.id].name, id: p.id }; });
+  }
   function collectCases() {
     var out = [];
     allChapters().forEach(function (c) {
       chapterSections(c).forEach(function (s) {
         (s.cases || []).forEach(function (cs) {
-          out.push({ text: cs.text, source: cs.source || "", takeaway: cs.takeaway || "",
-            chId: c.id, chTitle: c.title, label: s.label || "" });
+          var item = { text: cs.text, source: cs.source || "", takeaway: cs.takeaway || "",
+            chId: c.id, chTitle: c.title, label: s.label || "" };
+          item.syms = caseSyms(item); item.points = casePoints(item);
+          out.push(item);
         });
       });
     });
@@ -562,6 +592,7 @@
     var q = casesQ.trim().toLowerCase();
     var list = all.filter(function (c) {
       if (casesChapter && c.chTitle !== casesChapter) return false;
+      if (casesSym && c.syms.indexOf(casesSym) < 0) return false;
       if (q && (c.text + " " + c.source + " " + c.takeaway).toLowerCase().indexOf(q) < 0) return false;
       return true;
     });
@@ -570,17 +601,83 @@
         var n = all.filter(function (c) { return c.chTitle === t; }).length;
         return '<button class="read-toggle' + (casesChapter === t ? " on" : "") + '" onclick="App.casesFilter(\'' + esc(t) + '\', \'\')">' + esc(t) + ' ' + n + '</button>';
       })).join("");
+    /* 病症维度 chips */
+    var syms = [];
+    all.forEach(function (c) { c.syms.forEach(function (t) { if (syms.indexOf(t) < 0) syms.push(t); }); });
+    var symChips = syms.map(function (t) {
+      var n = all.filter(function (c) { return c.syms.indexOf(t) >= 0; }).length;
+      return '<button class="read-toggle' + (casesSym === t ? " on" : "") + '" onclick="App.casesSym(\'' + esc(t) + '\')">' + esc(t) + ' ' + n + '</button>';
+    }).join("");
     var cards = list.map(function (c) {
+      var ptChips = c.points.map(function (p) {
+        return '<a class="tag moss" href="#/point/' + esc(p.id) + '">穴 · ' + esc(p.name) + '</a>';
+      }).join(" ");
+      var symChips = c.syms.map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join(" ");
       return '<div class="case" style="margin-bottom:14px"><div class="cs-title">' + esc(c.chTitle) + (c.label ? ' · ' + esc(c.label) : '') + '</div>' +
         esc(c.text) +
         '<div class="src">—— ' + esc(c.source) + (c.takeaway ? ' · 启示：' + esc(c.takeaway) : '') + '</div>' +
+        ((symChips || ptChips) ? '<div style="margin:8px 0 4px">' + symChips + ' ' + ptChips + '</div>' : '') +
         '<div style="margin-top:8px"><a class="btn ghost" href="#/classic/' + esc(c.chId) + '">回到原文语境 →</a></div></div>';
     }).join("");
     return '<div class="page"><div class="page-title">医案<span class="zh-dot"> · </span>对账库</div>' +
       '<div class="page-sub">散在经典条文下的真实医案汇总于此 · <span class="src">全部注明出处，学理以医案验证——「读经不验案，如观图不渡」</span></div>' +
       '<div style="margin-bottom:12px"><input class="search-input-big" id="cases-q" value="' + esc(casesQ) + '" placeholder="按病症/人物/书名搜，如：头风 / 华佗 / 龋齿"></div>' +
-      '<div style="margin-bottom:16px">' + chips + '</div>' +
+      '<div style="margin-bottom:8px">' + chips + '</div>' +
+      (symChips ? '<div style="margin-bottom:16px"><span class="fl" style="margin-right:8px">病症</span>' + symChips + '</div>' : '') +
       (list.length ? cards : '<div class="empty">没有命中的医案</div>') + '</div>';
+  }
+
+  /* ---------- 周学习报告 ---------- */
+  function fmtD(dt) {
+    return dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0") + "-" + String(dt.getDate()).padStart(2, "0");
+  }
+  function reportView() {
+    var days = Store.days(), raw = Store.raw();
+    /* 近七日：已读条数（打卡计数）+ 诵读篇数 + 循经通关 */
+    var rows = "", weekRead = 0, weekRecite = 0, weekPw = 0;
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - i);
+      var k = fmtD(d);
+      var rd = days[k] || 0; weekRead += rd;
+      var rc = raw.recite && raw.recite[k] ? Object.keys(raw.recite[k]).length : 0; weekRecite += rc;
+      var pwN = 0;
+      if (raw.pathway) Object.keys(raw.pathway).forEach(function (a) {
+        if (raw.pathway[a].d === k) pwN++;
+      });
+      weekPw += pwN;
+      var wd = "日一二三四五六"[d.getDay()];
+      rows += '<tr><td>' + (i === 0 ? "今天" : "周" + wd) + '</td><td>' + k.slice(5) + '</td>' +
+        '<td>' + (rd ? "◉".repeat(Math.min(rd, 8)) + (rd > 8 ? "×" + rd : "") : "—") + '</td>' +
+        '<td>' + (rc ? "诵 " + rc + " 篇" : "—") + '</td>' +
+        '<td>' + (pwN ? "通 " + pwN + " 经" : "—") + '</td></tr>';
+    }
+    var st = Store.quizStats();
+    var rate = st.total ? Math.round(st.right / st.total * 100) : null;
+    var weakRows = st.weak.slice(0, 10).map(function (w, i) {
+      var p = pointMap[w.id];
+      return '<tr><td>' + (i + 1) + '</td><td><a href="#/point/' + esc(w.id) + '">' + esc(p ? p.name : w.id) + '</a></td>' +
+        '<td>对 ' + w.r + ' / 错 ' + w.w + '</td></tr>';
+    }).join("");
+    var reciteTotal = raw.recite ? Object.keys(raw.recite).reduce(function (s, k) { return s + Object.keys(raw.recite[k]).length; }, 0) : 0;
+    var pwTotal = raw.pathway ? Object.keys(raw.pathway).length : 0;
+    return '<div class="page"><div class="page-title">周报<span class="zh-dot"> · </span>学习</div>' +
+      '<div class="page-sub">生成于 ' + Store.today() + ' · <span class="src">数据全部来自本机浏览器的学习记录</span></div>' +
+      '<div class="stats-row">' +
+        '<div class="stat"><div class="num">' + weekRead + '</div><div class="lbl">本周已读</div></div>' +
+        '<div class="stat"><div class="num">' + Store.streak() + '</div><div class="lbl">连续天数</div></div>' +
+        '<div class="stat"><div class="num">' + Store.readCount() + '</div><div class="lbl">累计已读</div></div>' +
+        '<div class="stat"><div class="num">' + (rate === null ? "—" : rate + "%") + '</div><div class="lbl">自测正确率</div></div>' +
+      '</div>' +
+      '<h2 class="sec">近七日</h2>' +
+      '<table class="report-table"><tr><th>日</th><th>日期</th><th>已读条目</th><th>诵读</th><th>循经点穴</th></tr>' + rows + '</table>' +
+      '<h2 class="sec">自测</h2>' +
+      '<div class="card">累计 ' + st.total + ' 题' + (rate !== null ? ' · 正确率 ' + rate + '%' : ' · 尚未答题') +
+        ' · 诵读累计 ' + reciteTotal + ' 篇 · 循经通关累计 ' + pwTotal + ' 经</div>' +
+      (st.weak.length ? '<h2 class="sec">薄弱穴 Top10</h2>' +
+        '<table class="report-table"><tr><th>#</th><th>穴位</th><th>记录</th></tr>' + weakRows + '</table>' : '') +
+      '<div style="margin-top:24px" class="no-print"><button class="btn" onclick="window.print()">打印 / 存 PDF</button>' +
+        '<span class="src" style="margin-left:10px">打印时自动隐藏导航与按钮</span></div>' +
+      '</div>';
   }
 
   /* ---------- 导出 ---------- */
@@ -588,7 +685,7 @@
     home: homeView, theory: theoryView, meridians: meridiansView, meridian: meridianView,
     point: pointView, classics: classicsView, classic: classicView, search: searchView,
     notes: notesView, backup: backupView, buildIndex: buildIndex, quiz: quizView,
-    compare: compareView, pathway: pathwayView, cases: casesView,
+    compare: compareView, pathway: pathwayView, cases: casesView, report: reportView,
     helpers: { esc: esc, MER_ABBR: MER_ABBR, allPoints: allPoints, pointMap: pointMap, chapterMap: chapterMap }
   };
 
@@ -603,6 +700,7 @@
   /* 医案库筛选状态（供 App 调用） */
   window.Views.casesFilter = function (ch, q) { casesChapter = ch; casesQ = q || ""; };
   window.Views.casesCurrentChapter = function () { return casesChapter; };
+  window.Views.casesSetSym = function (t) { casesSym = (casesSym === t) ? "" : t; };
 
   /* 局部重绘点穴区（供 App.pwPick/pwReset 调用，避免整页重绘丢失节奏） */
   window.Views.pwArea = function () { return pwAreaHtml(); };
