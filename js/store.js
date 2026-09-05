@@ -112,9 +112,14 @@
         var q = state.quiz[id];
         if (typeof q.t !== "number" || typeof q.s !== "number") return;
         var iv = (Store.QUIZ_IV[Math.min(q.s, Store.QUIZ_IV.length - 1)] || 1) * 864e5;
-        if (now >= q.t + iv) due.push({ id: id, overdue: Math.floor((now - q.t - iv) / 864e5) });
+        if (now >= q.t + iv) {
+          var overdue = Math.floor((now - q.t - iv) / 864e5);
+          // 错题卡（阶段0/错多于对）次日必出且排最前：排序权值加 1000 天
+          var pri = (q.s === 0 || q.w > q.r) ? overdue + 1000 : overdue;
+          due.push({ id: id, overdue: overdue, pri: pri });
+        }
       });
-      due.sort(function (a, b) { return b.overdue - a.overdue; }); // 最久超期优先
+      due.sort(function (a, b) { return b.pri - a.pri; }); // 错题最久超期优先
       return due;
     },
     quizStats: function () {

@@ -1,0 +1,602 @@
+{
+ "LU1": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『中府，肺之募也，一名膺中俞，在云门下一寸，乳上三肋间陷者中，动脉应手，仰而取之，手太阴之会，刺入三分，留五呼，灸五壮。』"
+ },
+ "LU2": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『云门，在巨骨下，气户两傍各二寸陷者中，动脉应手，太阴脉气所发，举臂取之，刺入七分，灸五壮，刺太深令人逆息。』"
+ },
+ "LU5": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：入于尺泽，尺泽，肘中之动脉也，为合。"
+ },
+ "LU7": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·经脉》：手太阴之别，名曰列缺，起于腕上分间，并太阴之经，直入掌中，散入于鱼际。"
+ },
+ "LU9": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：注于太渊，太渊，鱼后一寸陷者中也，为腧。"
+ },
+ "LU10": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：溜于鱼际，鱼际者，手鱼也，为荥。"
+ },
+ "LU11": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：肺出于少商，少商者，手大指端内侧也，为井木。"
+ },
+ "LI1": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：大肠上合手阳明，出于商阳，商阳，大指次指之端也，为井金。"
+ },
+ "LI2": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：溜于本节之前二间，为荥。"
+ },
+ "LI3": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：注于本节之后三间，为腧。"
+ },
+ "LI4": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：过于合谷，合谷，在大指岐骨之间，为原。"
+ },
+ "LI5": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：行于阳溪，阳溪，在两筋间陷者中也，为经。"
+ },
+ "LI6": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·经脉》：手阳明之别，名曰偏历，去腕三寸，别入太阴。"
+ },
+ "LI11": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：入于曲池，在肘外辅骨陷者中，屈臂而得之，为合。"
+ },
+ "LI16": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『巨骨，在肩端上行两叉骨间陷者中，手阳明、跷脉之会，刺入一寸五分，灸五壮。』"
+ },
+ "LI17": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『天鼎，在缺盆上，直扶突，气舍后一寸五分，手阳明脉气所发，刺入四分，灸三壮。』"
+ },
+ "LI18": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『扶突，在人迎后一寸五分，手阳明脉气所发，刺入三分，灸三壮。』"
+ },
+ "LI20": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『鼻下孔旁，手、足阳明之会，刺入三分。』（一名冲阳）"
+ },
+ "ST2": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》载四白在目下一寸、颧骨孔处（据原书概述）。"
+ },
+ "ST4": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『地仓，一名会维，侠口傍四分，如近下是，跷脉、手足阳明之会，刺入三分。』"
+ },
+ "ST6": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『颊车，在耳下曲颊端陷者中，开口有孔，足阳明脉气所发，刺入三分，灸三壮。』"
+ },
+ "ST7": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『下关，在客主人下，耳前动脉下空下廉，合口有孔，张口即闭，足阳明、少阳之会，刺入三分，留七呼，灸三壮』"
+ },
+ "ST8": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》载头维在额角发际、本神两旁各一寸五分（据原书概述）。"
+ },
+ "ST18": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》载乳根在乳下一寸六分陷者中（据原书概述）。"
+ },
+ "ST25": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『天枢，大肠募也，一名长溪，一名谷门，去肓俞一寸五分，侠脐两傍各二寸陷者中，足阳明脉气所发，刺入五分，留七呼，灸五壮。』"
+ },
+ "ST29": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》载归来（一名溪穴）在水道下二寸（据原书概述）。"
+ },
+ "ST34": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『在膝上二寸，刺入三分，灸三壮。』"
+ },
+ "ST36": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·邪气藏府病形》：胃合于三里。后世《四总穴歌》：肚腹三里留。"
+ },
+ "ST37": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·邪气藏府病形》：大肠合入于巨虚上廉。"
+ },
+ "ST38": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》载条口在下廉上一寸（据原书概述）。"
+ },
+ "ST39": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『巨虚下廉，足阳明与小肠合，在上廉下三寸，刺入三分，灸三壮。』"
+ },
+ "ST40": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·经脉》：足阳明之别，名曰丰隆，去踝八寸，别走太阴。"
+ },
+ "ST41": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：行于解溪，解溪，上冲阳一寸半陷者中也，为经。"
+ },
+ "ST42": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『冲阳，一名会原，在足趺上五寸骨间动脉，上去陷骨三寸，足阳明脉之所过也。为原。刺入三分，留十呼，灸三壮。』"
+ },
+ "ST44": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『内庭者，水也。在足大指次指外间陷者中，足阳明脉之所留也，为荥。刺入三分，留二十呼，（气穴论注云：留十呼）灸三壮。』"
+ },
+ "ST45": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：胃出于厉兑，厉兑者，足大趾内次趾之端也，为井金。"
+ },
+ "SP1": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：脾出于隐白，隐白者，足大趾之端内侧也，为井木。"
+ },
+ "SP2": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『大都者，火也。在足大指本节后陷者中，足太阴脉之所溜也，为荥。刺入三分，留七呼，灸一壮。』"
+ },
+ "SP3": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：注于太白，太白，核骨之下也，为腧。"
+ },
+ "SP4": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·经脉》：足太阴之别，名曰公孙，去本节之后一寸，别走阳明；其别者，入络肠胃。"
+ },
+ "SP5": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『商丘者，金也。在足内踝下微前陷者中，足太阴脉之所行也，为经。刺入三分，留七呼，灸三壮。』"
+ },
+ "SP6": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『三阴交，在内踝上三寸，骨下陷者中，足太阴、厥阴、少阴之会，刺入三分，留七呼，灸三壮。』"
+ },
+ "SP8": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『在膝下五寸，刺入三分，灸三壮。』（一名脾舍）"
+ },
+ "SP9": {
+  "file": "data/acupoints-1.js",
+  "classic": "《灵枢·本输》：入于阴之陵泉，阴之陵泉，辅骨之下陷者之中也，为合。"
+ },
+ "SP10": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『血海，在膝膑上内廉白肉际二寸中，足太阴脉气所发，刺入五分，灸五壮。』"
+ },
+ "SP21": {
+  "file": "data/acupoints-1.js",
+  "classic": "《针灸甲乙经》：『大包，在渊腋下三寸，脾之大络，布胸胁中，出九肋间，及季胁端，别络诸阴者，刺入三分，灸三壮。』"
+ },
+ "HT3": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：少海，在肘内廉节后陷者中，动脉应手，手少阴脉之所入也，为合。"
+ },
+ "HT7": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：神门，在掌后兑骨之端陷者中，手少阴脉之所注也，为输。"
+ },
+ "SI1": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『少泽者，金也。一名小吉，在手小指之端，去爪甲下一分陷者中，手太阳脉之所出也，为井。刺入一分，留二呼，灸一壮。』"
+ },
+ "SI2": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『前谷者，水也。在手小指外侧，本节前陷者中，手太阳脉之所溜也，为荥。刺入一分，留三呼，灸三壮。』"
+ },
+ "SI3": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：后溪者，在手外侧本节之后也，为输。"
+ },
+ "SI5": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『阳谷者，火也。在手外侧腕中，兑骨下陷者中，手太阳脉之所行也，为经。刺入二分，留二呼（气穴论注云：留三呼），灸三壮。』"
+ },
+ "SI6": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：养老，在手踝骨上一空，腕后一寸陷者中，手太阳郄也。"
+ },
+ "SI7": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『支正，手太阳络，在肘后（一本作腕后）五寸，别走少阴者，刺入三分，留七呼，灸三壮。』"
+ },
+ "SI8": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『小海者，土也。在肘内大骨外，去肘端五分陷者中，屈肘乃得之，手太阳脉之所入也，为合。刺入二分，留七呼，灸七壮。』"
+ },
+ "SI9": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：肩贞，在肩曲胛下，两骨解间，肩髃后陷者中。"
+ },
+ "SI11": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：天宗，在秉风后大骨下陷者中，手太阳脉气所发。"
+ },
+ "SI19": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：听宫，在耳中珠子，大明如赤小豆，手足少阳、手太阳之会也。"
+ },
+ "BL2": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：攒竹，在眉头陷者中，足太阳脉气所发。"
+ },
+ "BL10": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：天柱，在侠项后发际，大筋外廉陷者中，足太阳脉气所发。"
+ },
+ "BL11": {
+  "file": "data/acupoints-2.js",
+  "classic": "《难经·四十五难》：「骨会大杼。」骨病可取大杼。"
+ },
+ "BL12": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》载风门（一名热府）在第二椎下两旁各一寸五分（据原书概述）。"
+ },
+ "BL13": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：肺俞，在第三椎下两旁各一寸五分。"
+ },
+ "BL15": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『心俞，在第五椎下，两傍各一寸五分，刺入三分，留七呼，禁灸。』"
+ },
+ "BL17": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：膈俞，在第七椎下两旁各一寸五分。另《难经·四十五难》：血会膈俞。"
+ },
+ "BL18": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：肝俞，在第九椎下两旁各一寸五分。"
+ },
+ "BL19": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『胆俞，在第十椎下，两傍各一寸五分，足太阳脉所发，正坐取之，刺入五分，灸三壮。』"
+ },
+ "BL20": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：脾俞，在第十一椎下两旁各一寸五分。"
+ },
+ "BL21": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『胃俞，在第十二椎下，两傍各一寸五分，刺入三分，留七呼，灸三壮。』"
+ },
+ "BL22": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『三焦俞，在第十三椎下，两傍各一寸五分，足太阳脉气所发，刺入五分，灸三壮。』"
+ },
+ "BL23": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：肾俞，在第十四椎下两旁各一寸五分。"
+ },
+ "BL27": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『小肠俞，在第十八椎下两傍各一寸五分，刺入三分，留六呼，灸三壮。』"
+ },
+ "BL28": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『膀胱俞，在第十九椎下，两傍各一寸五分，刺入三分，留六呼，灸三壮。』"
+ },
+ "BL39": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『委阳，三焦下辅俞也，在足太阳之前，少阳之后』"
+ },
+ "BL40": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：委中，腘中央，为合，委而取之。另四总穴歌云：腰背委中求。"
+ },
+ "BL57": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：承山，在兑腨肠下分肉间陷者中。"
+ },
+ "BL58": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『飞扬，一名厥阳，在足外踝上七寸，足太阳络，别走少阴者，刺入三分，灸三壮。』"
+ },
+ "BL60": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：昆仑，在外踝后，跟骨上陷中，细脉动应手，足太阳脉之所行也，为经。"
+ },
+ "BL62": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『申脉，阳跷所生也，在足外踝下（刺腰痛论注云：外踝下五分）陷者中，容爪甲许，刺入三分，留六呼，灸三壮。』"
+ },
+ "BL63": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『在足外踝下，一名关梁，阳维所别属也，刺入三分，灸三壮。』"
+ },
+ "BL64": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『京骨，在足外侧大骨下，赤白肉际陷者中，按而得之，足太阳脉之所过也，为原。刺入三分，留七呼，灸三壮。』"
+ },
+ "BL65": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『束骨者，木也。在足小指外侧，本节后陷者中，足太阳脉之所注也，为俞。刺入三分，灸三壮。』"
+ },
+ "BL67": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『至阴者，金也。在足小指外侧，去爪甲角如韭叶，足太阳脉之所出也，为井，刺入三分，留五呼，灸五壮。』"
+ },
+ "KI1": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：肾出于涌泉，涌泉者足心也，为井木。"
+ },
+ "KI2": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：溜于然谷，然谷，然骨之下者也，为荥。"
+ },
+ "KI3": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：太溪，内踝之后，跟骨之上，陷者中也，为输。"
+ },
+ "KI4": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·经脉》：足少阴之别，名曰大钟，当踝后绕跟，别走太阳。"
+ },
+ "KI6": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：照海，阴跷脉所生，在足内踝下一寸。"
+ },
+ "KI7": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：行于复溜，复溜，上内踝二寸，动而不休，为经。"
+ },
+ "KI8": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『交信，在足内踝上二寸，少阴前，太阴后，筋骨间』"
+ },
+ "KI10": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：阴谷，在辅骨之后，大筋之下，小筋之上也，按之应手，屈膝而得之，为合。"
+ },
+ "PC1": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『天池，一名天会，在乳后一寸（气府论注云二寸），腋下三寸，着胁直掖撅肋间，手厥阴足少阳脉之会』"
+ },
+ "PC7": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：过于大陵，大陵，掌后两筋之间方下者也，为输。"
+ },
+ "TE1": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：三焦者，上合手少阳，出于关冲，关冲者，手小指次指之端也，为井金。"
+ },
+ "TE3": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：注于中渚，中渚，在本节之后陷者中也，为输。"
+ },
+ "TE4": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：阳池，在手表腕上陷者中，手少阳脉之所过也，为原。"
+ },
+ "TE5": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：外关，手少阳络，在腕后二寸陷者中，别走心主。"
+ },
+ "TE6": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：支沟，手少阳脉之所行也，为经，在腕后三寸两骨之间陷者中。"
+ },
+ "TE16": {
+  "file": "data/acupoints-3.js",
+  "classic": "《针灸甲乙经》：『天牖，在颈筋间，缺盆上，天容后，天柱前，完骨后，发际上，手少阳脉气所发，刺入一分，灸三壮。』"
+ },
+ "TE17": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》载翳风在耳后陷者中，按之引耳中痛（据原书概述）。"
+ },
+ "TE21": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》载耳门在耳前起肉当耳缺者（据原书概述）。"
+ },
+ "GB2": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：听会，在耳前陷者中，张口得之，动脉应手。"
+ },
+ "GB12": {
+  "file": "data/acupoints-3.js",
+  "classic": "《针灸甲乙经》：『完骨，在耳后，入发际四分，足太阳、少阳之会，刺入二分，留七呼，灸七壮。』"
+ },
+ "GB13": {
+  "file": "data/acupoints-3.js",
+  "classic": "《针灸甲乙经》：『本神，在曲差两傍各一寸五分，在发际（一曰直耳上入发际四分）足少阳、阳维之会，刺入三分，灸三壮。』"
+ },
+ "GB14": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：阳白，在眉上一寸直瞳子，足少阳、阳维之会。"
+ },
+ "GB20": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：风池，在颞颥后发际陷者中，足少阳、阳维之会。"
+ },
+ "GB21": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：肩井，在肩上陷者中，缺盆上，大骨前。"
+ },
+ "GB24": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『日月，胆募也，在期门下一寸五分，足太阴、少阳之会，刺入七分，灸五壮。』"
+ },
+ "GB25": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『京门，肾募也，一名气府，一名气俞，在监骨下，腰中挟脊，季肋下一寸八分，刺入三分，留七呼，灸三壮。』"
+ },
+ "GB30": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：环跳，在髀枢中，侧卧伸下足，屈上足取之，足少阳脉气所发。"
+ },
+ "GB34": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：阳陵泉，在膝下一寸，胻外廉陷者中，足少阳脉之所入也，为合。另《难经·四十五难》：筋会阳陵泉。"
+ },
+ "GB36": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『在外踝上七寸，刺入三分，灸三壮。』"
+ },
+ "GB37": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：光明，足少阳络，在足外踝上五寸，别走厥阴。"
+ },
+ "GB38": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『阳辅者，火也。在足外踝上四寸（气穴论注无四寸二字）辅骨前，绝骨端，如前三分，去丘墟七寸，足少阳脉之所行也，为经。刺入五分，留七呼，灸三壮。』"
+ },
+ "GB39": {
+  "file": "data/acupoints-2.js",
+  "classic": "《难经·四十五难》：髓会绝骨。"
+ },
+ "GB40": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：丘墟，在外踝下如前陷者中，足少阳脉之所过也，为原。"
+ },
+ "GB43": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『侠溪者，水也。在足小指次指二歧骨间，本节前陷者中，足少阳脉之所溜也，为荥。刺入三分，留三呼，灸三壮。』"
+ },
+ "LV1": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：肝出于大敦，大敦者，足大指之端及三毛之中也，为井木。"
+ },
+ "LV2": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：溜于行间，行间，足大指间也，为荥。"
+ },
+ "LV3": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：注于太冲，太冲，行间上二寸陷者之中也，为输。（按：古法取穴稍异，今取第1、2跖骨结合部前凹陷中）"
+ },
+ "LV4": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『中封者，金也。在足内踝前一寸，仰足取之陷者中，伸足乃得之，足厥阴脉之所注也，为经。刺入四分，留七呼，灸三壮。』"
+ },
+ "LV5": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：蠡沟，足厥阴之络，在内踝上五寸，别走少阳。"
+ },
+ "LV8": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·本输》：入于曲泉，曲泉，辅骨之下，大筋之上也，屈膝而得之，为合。"
+ },
+ "LV13": {
+  "file": "data/acupoints-2.js",
+  "classic": "《难经·四十五难》：脏会季胁。（章门即季胁之穴）"
+ },
+ "LV14": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『期门，肝募也，在第二肋端，不容傍各一寸五分，上直两乳，足太阴厥阴、阴维之会，举臂取之，刺入四分，灸五壮。』"
+ },
+ "CV3": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『中极，膀胱募也，一名气原，一名玉泉，在脐下四寸，足三阴、任脉之会，刺入二寸（气府论注云：刺入一寸二分），留七呼，灸三壮。』"
+ },
+ "CV4": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：关元，小肠募也，在脐下三寸，足三阴、任脉之会。"
+ },
+ "CV5": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》载此穴「女子不可灸刺，不幸使人绝子」——此说历代有争议，今多仅作育龄女性慎用的提示。"
+ },
+ "CV6": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·九针十二原》：肓之原，出于脖胦。（脖胦即气海）"
+ },
+ "CV7": {
+  "file": "data/acupoints-3.js",
+  "classic": "《针灸甲乙经》：『阴交，一名少关，一名横户，在脐下一寸，任脉、气冲之会，刺入八分，灸五壮。』"
+ },
+ "CV9": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》载水分在下脘下一寸（据原书概述）。"
+ },
+ "CV10": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》载下脘在建里下一寸（据原书概述）。"
+ },
+ "CV12": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：中脘，一名太仓，在脐上四寸，胃募也。另《难经·四十五难》：腑会太仓。"
+ },
+ "CV13": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『上脘，在巨阙下一寸五分，去蔽骨三寸，任脉、足阳明、手太阳之会，刺入八寸，灸五壮。』"
+ },
+ "CV14": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：『巨阙，心募也，在鸠尾下一寸，任脉气所发，刺入六分，（气府论注云：刺入一寸二分，）留七呼，灸五壮。』"
+ },
+ "CV15": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》载鸠尾在臆前弊骨下五分（据原书概述）。"
+ },
+ "CV22": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》载天突在颈结喉下二寸中央宛宛中（据原书概述）。"
+ },
+ "CV23": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：廉泉，在颔下，结喉上，舌本下，阴维、任脉之会。"
+ },
+ "CV24": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：承浆，在颐前唇之下陷者中，足阳明、任脉之会。"
+ },
+ "GV1": {
+  "file": "data/acupoints-2.js",
+  "classic": "《灵枢·经脉》：督脉之别，名曰长强，挟膂上项，散头上，下当肩胛左右，别走太阳。"
+ },
+ "GV2": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：腰俞，在第二十一椎节下间，督脉气所发。"
+ },
+ "GV4": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：命门，在第十四椎节下间，督脉气所发，伏而取之。"
+ },
+ "GV11": {
+  "file": "data/acupoints-3.js",
+  "classic": "《针灸甲乙经》：『神道，在第五椎节下间，督脉气所发，俯而取之，刺入五分，留五呼，灸三壮。』"
+ },
+ "GV12": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：身柱，在第三椎节下间，督脉气所发，俛而取之。"
+ },
+ "GV13": {
+  "file": "data/acupoints-3.js",
+  "classic": "《针灸甲乙经》：『陶道，在大椎节下间，督脉、足太阳之会，俯而取之，刺入五分，留五呼，灸五壮。』"
+ },
+ "GV14": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：大椎，在第一椎上陷者中，三阳督脉之会。"
+ },
+ "GV16": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：风府，在项上入发际一寸，大筋内宛宛中，督脉、阳维之会。"
+ },
+ "GV20": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：百会，一名三阳五会，在前顶后一寸五分，项中央旋毛中，陷可容指，督脉、足太阳之会。"
+ },
+ "GV24": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》载神庭在发际直上（据原书概述）。"
+ },
+ "GV26": {
+  "file": "data/acupoints-2.js",
+  "classic": "《针灸甲乙经》：水沟，在鼻柱下人中，督脉、手阳明之会。"
+ }
+}
