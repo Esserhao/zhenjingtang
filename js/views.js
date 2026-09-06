@@ -128,7 +128,7 @@
       '</div>' +
       '<div class="home-grid">' +
         '<div class="daily-card">' +
-          '<h3>' + esc(p.name) + '</h3><div class="py">' + esc(p.pinyin) + ' · ' + esc(p.meridian) + (p.special ? ' · ' + esc(p.special) : '') + '</div>' +
+          '<h3>' + esc(p.name) + (Store.isRead(p.id) ? ' <span style="color:var(--cinnabar)">◉</span>' : '') + '</h3><div class="py">' + esc(p.pinyin) + ' · ' + esc(p.meridian) + (p.special ? ' · ' + esc(p.special) : '') + '</div>' +
           '<div style="font-size:15px">' + esc(p.location || "") + '</div>' +
           (p.care ? '<div style="font-size:14px;color:#6b6154;margin-top:8px">保健：' + esc(p.care) + '</div>' : '') +
           (q ? '<div class="quote"><b>今日经句</b>（' + esc(q.src) + '）<br>' + esc(q.original) + '</div>' : '') +
@@ -352,6 +352,9 @@
         '<div class="field"><div class="fl">主治</div><div class="indications">' +
           (p.indications || []).map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div></div>' +
         (p.care ? '<div class="field"><div class="fl">居家保健</div><div>' + esc(p.care) + '</div></div>' : '') +
+        (p.classic ? '<div class="field"><div class="fl">经典出处</div><div class="classic-quote">' + esc(p.classic) + '</div></div>' : '') +
+        (Store.getNote(p.id) ? '<div class="field"><div class="fl">你的朱批笔记</div><div style="font-size:14px;color:#7e2b1e;border:1px dashed var(--cinnabar);border-radius:3px;padding:8px 12px;background:rgba(160,58,42,.04)">' + esc(Store.getNote(p.id)) + '</div>' +
+          '<div style="margin-top:4px"><a class="btn ghost" href="#/point/' + esc(p.id) + '">去完善笔记 →</a></div></div>' : '') +
       '</div>' +
       '<div class="q-actions" id="quiz-actions">' +
         (!quizRevealed ? '<button class="btn" onclick="App.quizFlip()">翻面对照</button>' : '') +

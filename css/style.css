@@ -507,10 +507,14 @@ textarea.note-box:focus { border-color: var(--cinnabar); }
   body { background: #fff; }
   .layout { display: block; }
   .sidebar, .no-print, .pn-nav { display: none !important; }
+  .btn, .read-toggle, .search-input-big, .font-toggle { display: none !important; }
+  textarea.note-box { border: none; background: #fff; resize: none; min-height: 0; }
   .main { padding: 0; }
   .page { max-width: 100%; }
   .page-title { font-size: 24px; }
   .card, .report-table { box-shadow: none; }
+  .section-item, .card, .case, .debate { break-inside: avoid; }
+  .original { font-size: 14pt; }
 }
 
 /* ---------- 阅读进度与跳读 ---------- */
