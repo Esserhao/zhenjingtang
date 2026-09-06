@@ -154,15 +154,19 @@
     if (courseId) {
       var c = courses.find(function (x) { return x.id === courseId; });
       if (!c) return '<div class="empty">未找到该课程</div>';
-      var body = chapterSections(c).map(function (s, i) {
+      var secs = chapterSections(c);
+      var toc = '<div class="read-progress no-print">本课小节：' + secs.map(function (s, i) {
+        return '<a class="tag' + (Store.isRead(c.id + "#" + i) ? " moss" : "") + '" href="javascript:void(0)" onclick="App.secJump(\'th-' + esc(c.id) + '-' + i + '\')">' + esc(s.h) + (Store.isRead(c.id + "#" + i) ? ' ◉' : '') + '</a>';
+      }).join(" ") + '</div>';
+      var body = secs.map(function (s, i) {
         var paras = String(s.body).split("\n\n").map(function (t) { return "<p>" + t + "</p>"; }).join("");
-        return '<h2 class="sec">' + esc(s.h) + '</h2><div class="theory-body">' + paras + '</div>' +
+        return '<h2 class="sec" id="th-' + esc(c.id) + '-' + i + '">' + esc(s.h) + '</h2><div class="theory-body">' + paras + '</div>' +
           readToggleHtml(c.id + "#" + i);
       }).join("");
       return '<div class="page">' +
         '<div class="crumb"><a href="#/theory">理论</a> / ' + esc(c.title) + '</div>' +
         '<div class="page-title">' + esc(c.title) + '</div>' +
-        '<div class="page-sub">第 ' + c.order + ' 课 · 学完一节点「已读」，打卡自动记录</div>' + body + '</div>';
+        '<div class="page-sub">第 ' + c.order + ' 课 · 学完一节点「已读」，打卡自动记录</div>' + toc + body + '</div>';
     }
     var items = courses.slice().sort(function (a, b) { return a.order - b.order; }).map(function (c) {
       var secs = chapterSections(c);
@@ -287,8 +291,14 @@
       (nextC ? '<a class="pn-btn" href="#/classic/' + esc(nextC.id) + '">' + esc(nextC.title) + ' →</a>' : '<span class="pn-btn ghost2"></span>') +
       '</div>';
     var secs = chapterSections(c);
+    var doneN = secs.filter(function (s) { return Store.isRead(s.secId); }).length;
+    var nextUnread = secs.findIndex(function (s) { return !Store.isRead(s.secId); });
+    var jump = (nextUnread >= 0 && doneN < secs.length)
+      ? '<button class="btn ghost" onclick="App.jumpUnread(' + nextUnread + ')">跳到下一个未读（第' + esc(secs[nextUnread].label || nextUnread + 1) + '条）→</button>' : '';
+    var prog = '<div class="read-progress no-print">本篇进度 <b>' + doneN + '</b> / ' + secs.length + ' 条' + (doneN === secs.length ? ' · ✓ 已读完' : '') +
+      ' <span style="margin-left:12px">' + jump + '</span></div>';
     var body = secs.map(function (s, i) {
-      return '<div class="section-item card">' +
+      return '<div class="section-item card" id="secidx-' + i + '">' +
         '<div class="original"><span class="sec-no">' + esc(s.label || (i + 1)) + '</span>' + esc(s.original) + '</div>' +
         (s.translation ? '<div class="translation"><span class="tt">AI 参考译文</span><br>' + esc(stripPrefix(s.translation)) + '</div>' : '') +
         (s.keynotes ? '<div class="keynote"><b>零基础要点</b> · ' + esc(stripPrefix(s.keynotes)) + '</div>' : '') +
@@ -299,6 +309,7 @@
       '<div class="crumb"><a href="#/classics">经典诵读</a> / ' + esc(c.title) + '</div>' +
       '<div class="page-title">' + esc(c.title) + (Store.recitedToday(c.id) ? ' <span class="recite-seal">今日已诵</span>' : '') + '</div>' +
       '<div class="page-sub">' + esc(c.source) + (c.note ? ' · ' + esc(c.note) : '') + '</div>' +
+      prog +
       (Store.recitedToday(c.id) ? '' :
         '<div style="margin:0 0 14px"><button class="btn" onclick="App.reciteDone(\'' + esc(c.id) + '\')">诵毕打卡 ✓ 记今日诵读</button>' +
         '<span class="src" style="margin-left:10px">朗读一遍后点此，计入今日打卡</span></div>') +
@@ -670,8 +681,9 @@
     }).join("");
     var reciteTotal = raw.recite ? Object.keys(raw.recite).reduce(function (s, k) { return s + Object.keys(raw.recite[k]).length; }, 0) : 0;
     var pwTotal = raw.pathway ? Object.keys(raw.pathway).length : 0;
+    var novice = (Store.readCount() === 0) ? '<div class="card" style="border-color:var(--cinnabar)"><h3>还没有学习记录</h3><div style="font-size:14px">学一点再来看报告：先到「入门」看三步上手，或直接读理论第一课。</div><div style="margin-top:10px"><a class="btn" href="#/guide">三步上手 →</a></div></div>' : '';
     return '<div class="page"><div class="page-title">周报<span class="zh-dot"> · </span>学习</div>' +
-      '<div class="page-sub">生成于 ' + Store.today() + ' · <span class="src">数据全部来自本机浏览器的学习记录</span></div>' +
+      '<div class="page-sub">生成于 ' + Store.today() + ' · <span class="src">数据全部来自本机浏览器的学习记录</span></div>' + novice +
       '<div class="stats-row">' +
         '<div class="stat"><div class="num">' + weekRead + '</div><div class="lbl">本周已读</div></div>' +
         '<div class="stat"><div class="num">' + Store.streak() + '</div><div class="lbl">连续天数</div></div>' +

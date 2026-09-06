@@ -410,8 +410,9 @@ textarea.note-box:focus { border-color: var(--cinnabar); }
   }
   .brand { margin: 0; display: flex; align-items: center; gap: 8px; }
   .brand-name { writing-mode: horizontal-tb; letter-spacing: 3px; margin: 0; }
-  .nav-tabs { flex-direction: row; flex-wrap: wrap; }
-  .nav-tab { writing-mode: horizontal-tb; letter-spacing: 2px; padding: 6px 10px; }
+  .nav-tabs { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; max-width: 100%; scrollbar-width: none; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab { writing-mode: horizontal-tb; letter-spacing: 2px; padding: 6px 10px; white-space: nowrap; flex-shrink: 0; }
   .sidebar-search { margin: 0; flex: 1; min-width: 160px; }
   .streak-chip { writing-mode: horizontal-tb; }
   .main { padding: 24px 18px 60px; }
@@ -511,6 +512,13 @@ textarea.note-box:focus { border-color: var(--cinnabar); }
   .page-title { font-size: 24px; }
   .card, .report-table { box-shadow: none; }
 }
+
+/* ---------- 阅读进度与跳读 ---------- */
+.read-progress {
+  background: #fbf7ec; border: 1px solid var(--line); border-radius: 3px;
+  padding: 10px 14px; margin-bottom: 18px; font-size: 14px; color: var(--ink-soft);
+}
+.read-progress b { color: var(--cinnabar); font-family: var(--serif-kai); }
 
 /* ---------- 小白友好：入门/术语/字号/无障碍 ---------- */
 a.tag { text-decoration: none; cursor: pointer; }

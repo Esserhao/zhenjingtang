@@ -327,6 +327,18 @@
       document.querySelectorAll(".font-btn").forEach(function (b) {
         b.classList.toggle("on", parseInt(b.dataset.lv, 10) === v);
       });
+    },
+    jumpUnread: function (idx) {
+      var el = document.getElementById("secidx-" + idx);
+      if (!el) return;
+      window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 16);
+      el.style.borderColor = "var(--cinnabar)";
+      setTimeout(function () { el.style.borderColor = ""; }, 1200);
+    },
+    secJump: function (elId) {
+      var el = document.getElementById(elId);
+      if (!el) return;
+      window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 16);
     }
   };
 
@@ -375,6 +387,24 @@
       b.classList.toggle("on", parseInt(b.dataset.lv, 10) === lv);
     });
   })();
+  /* 键盘普适：/ 聚焦搜索，←/→ 翻上一下一篇（经典/穴位页通用） */
+  document.addEventListener("keydown", function (e) {
+    var tag = (document.activeElement && document.activeElement.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (e.key === "/") {
+      e.preventDefault();
+      var sb = document.getElementById("global-search");
+      if (sb) sb.focus();
+      return;
+    }
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      var links = document.querySelectorAll(".pn-nav a.pn-btn");
+      if (!links.length) return;
+      var target = e.key === "ArrowLeft" ? links[0] : links[links.length - 1];
+      if (target && target.href) location.href = target.href;
+    }
+  });
+
   window.Views.buildIndex();
   window.addEventListener("hashchange", route);
   if (!location.hash) location.hash = "#/home";
