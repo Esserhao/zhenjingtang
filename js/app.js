@@ -26,6 +26,7 @@
       case "pathway": html = V.pathway(seg[1]); break;
       case "cases": html = V.cases(); break;
       case "report": html = V.report(); break;
+      case "guide": html = V.guide(seg[1]); break;
       case "backup": html = V.backup(); break;
       default: html = V.home();
     }
@@ -36,6 +37,7 @@
     updateStreakChip();
     if (seg[0] === "search") wireSearchBox();
     if (seg[0] === "cases") wireCasesBox();
+    if (seg[0] === "guide" && seg[1]) scrollToTerm(seg[1]);
     window.scrollTo(0, 0);
   }
 
@@ -315,6 +317,16 @@
     casesSym: function (t) {
       window.Views.casesSetSym(t);
       route();
+    },
+    dismissGuide: function () {
+      Store.dismissGuide();
+      route();
+    },
+    setFont: function (lv) {
+      var v = Store.setFontScale(parseInt(lv, 10));
+      document.querySelectorAll(".font-btn").forEach(function (b) {
+        b.classList.toggle("on", parseInt(b.dataset.lv, 10) === v);
+      });
     }
   };
 
@@ -346,6 +358,23 @@
     }
   });
 
+  function scrollToTerm(termId) {
+    var el = document.getElementById(decodeURIComponent(termId));
+    if (el) {
+      var top = el.getBoundingClientRect().top + window.scrollY - 20;
+      window.scrollTo(0, top);
+      el.style.borderColor = "var(--cinnabar)";
+    }
+  }
+
+  // 启动应用字号档并点亮对应按钮
+  (function () {
+    var lv = Store.fontScale();
+    if (lv) Store.setFontScale(lv);
+    document.querySelectorAll(".font-btn").forEach(function (b) {
+      b.classList.toggle("on", parseInt(b.dataset.lv, 10) === lv);
+    });
+  })();
   window.Views.buildIndex();
   window.addEventListener("hashchange", route);
   if (!location.hash) location.hash = "#/home";

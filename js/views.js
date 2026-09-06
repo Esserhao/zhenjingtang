@@ -106,10 +106,20 @@
       cells += '<div class="cell ' + lvl + '" title="' + k + " · " + n + ' 条"></div>';
     }
     var recentNotes = Object.keys(Store.raw().notes).length;
+    /* 首次访问引导卡：没有任何学习记录且未看过入门时显示 */
+    var firstVisit = Store.readCount() === 0 && !Store.guideSeen();
+    var guideCard = firstVisit ? '<div class="card" style="border-color:var(--cinnabar);margin-bottom:18px">' +
+      '<h3>第一次来？三步上手</h3>' +
+      '<div style="font-size:14px;line-height:2">① 读「理论」第一课〈经络总论〉，十五分钟打底<br>' +
+      '② 每天看「每日一穴」，点开细读，顺手按一按<br>' +
+      '③ 用「自测」巩固，答错的第二天自动排最前复习</div>' +
+      '<div style="margin-top:10px"><a class="btn" href="#/guide">看新手指南与术语表 →</a> ' +
+      '<button class="btn ghost" onclick="App.dismissGuide()">我知道了，直接逛</button></div></div>' : '';
 
     return '<div class="page">' +
       '<div class="page-title">针经堂<span class="zh-dot"> · </span>针灸自学</div>' +
       '<div class="page-sub">零基础起步 · 以《灵枢》为经，以腧穴为纬 · <span class="src">学以致用，先保健后针道</span></div>' +
+      guideCard +
       '<div class="stats-row">' +
         '<div class="stat"><div class="num">' + Store.readCount() + '</div><div class="lbl">已读条目</div></div>' +
         '<div class="stat"><div class="num">' + streak + '</div><div class="lbl">连续天数</div></div>' +
@@ -224,7 +234,7 @@
         '<div><div style="font-size:14px;color:#6b6154">' + esc(p.pinyin) + '</div>' +
         '<div style="margin-top:6px">' + readToggleHtml(p.id) + '</div></div></div>' +
       '<div style="margin:8px 0 18px"><span class="tag">' + esc(p.meridian) + '</span>' +
-        (p.special ? '<span class="tag moss">' + esc(p.special) + '</span>' : '') +
+        (p.special ? '<a class="tag moss" href="#/guide/t-teding" title="这是「特定穴」标签，点看解释">' + esc(p.special) + '</a>' : '') +
         '<span class="tag">' + esc(p.id) + '</span></div>' +
       (p.caution ? '<div class="warn">⚠ ' + esc(p.caution) + '</div>' : '') +
       '<div class="field"><div class="fl">定位</div><div>' + esc(p.location || "") + '</div></div>' +
@@ -680,12 +690,74 @@
       '</div>';
   }
 
+  /* ---------- 入门引导 + 术语快释（小白视角） ---------- */
+  var GUIDE_TERMS = [
+    { id: "t-jingluo", term: "经络", cat: "基础", def: "运行气血的通路，纵贯全身。主干有十二条（十二经脉），加上任、督等奇经八脉，构成针灸取穴的地图。" },
+    { id: "t-xue", term: "腧穴（穴位）", cat: "基础", def: "经络上气血汇聚、反应病痛、接受刺激的点。人体经穴共 361 个，另有经外奇穴。" },
+    { id: "t-teding", term: "特定穴", cat: "基础", def: "有特殊身份和用途的穴位总称——下面这些标签（五输穴、原穴、郄穴……）都是特定穴的分类。看到不认识就点它，跳到本表。" },
+    { id: "t-wushu", term: "五输穴", cat: "特定穴", def: "十二经在肘膝以下的井、荥、输、经、合五类穴。经气由小到大，如水流由泉到海。《难经》：井主心下满，荥主身热，输主体重节痛，经主喘咳寒热，合主逆气而泄。" },
+    { id: "t-yuan", term: "原穴", cat: "特定穴", def: "脏腑原气留止之处，多在腕踝附近。脏有病常查其原穴（「十二经皆以俞为原」，《难经·六十六难》）。" },
+    { id: "t-luo", term: "络穴", cat: "特定穴", def: "联络表里两经的枢纽，一穴管两条经。如列缺是肺经络穴，通任脉。" },
+    { id: "t-xi", term: "郄穴", cat: "特定穴", def: "经气深聚之处，共 16 个。擅长治急症、重症——如孔最（肺经郄穴）治急性咳血。" },
+    { id: "t-beishu", term: "背俞穴", cat: "特定穴", def: "脏腑之气输注于腰背的穴位，位于膀胱经第一侧线，离脊柱 1.5 寸。治脏腑慢性病要穴，如肝俞、肾俞。" },
+    { id: "t-mu", term: "募穴", cat: "特定穴", def: "脏腑之气汇聚于胸腹的穴位，与背俞穴前后呼应（俞募配穴）。如中脘是胃之募。" },
+    { id: "t-bahui", term: "八会穴", cat: "特定穴", def: "脏、腑、气、血、筋、脉、骨、髓八类精气会聚的八个穴位。如膈俞为血会、阳陵泉为筋会（《难经·四十五难》）。" },
+    { id: "t-bamai", term: "八脉交会穴", cat: "特定穴", def: "四肢上与奇经八脉相通的八个穴位，常两两配对使用，如内关配公孙治心胸胃。" },
+    { id: "t-xiahe", term: "下合穴", cat: "特定穴", def: "六腑之气下合于下肢的穴位，治腑病为主——「合治内府」（足三里治胃痛即此理）。" },
+    { id: "t-shidong", term: "是动病 / 所生病", cat: "经典", def: "《灵枢·经脉》术语。大致说：「是动」指本经经气异常变动发生的病候；「所生病」指本经腧穴所能主治的病。历代注家有分歧，诵读时看条文下的笺注卡。" },
+    { id: "t-deqi", term: "得气", cat: "针法", def: "针刺入穴后产生的酸、麻、胀、重感，古称「气至」——「气至而有效」（《灵枢·九针十二原》）。指压到位的酸胀感同理。" },
+    { id: "t-yingsui", term: "迎随补泻", cat: "针法", def: "以针刺方向区分补泻的针法：逆经脉来向而刺为迎（泻），顺经脉去向而刺为随（补）。诸家释义有分歧，见笺注。" },
+    { id: "t-miuci", term: "缪刺 / 巨刺", cat: "针法", def: "左病刺右、右病刺左的交叉取穴法：浅刺络脉为缪刺，深刺经穴为巨刺（《素问·缪刺论》）。" },
+    { id: "t-gudu", term: "骨度分寸法", cat: "取穴", def: "把身体某段骨性长度规定为固定「寸」数来折量取穴，人人比例一致。如两乳头之间作 8 寸——这里的「寸」不是尺子上的寸。" },
+    { id: "t-tongshen", term: "手指同身寸", cat: "取穴", def: "用自己的手指量自己的身体：拇指指间关节横宽作 1 寸，四指并拢横宽作 3 寸。方便但粗略，重要部位以骨度分寸为准。" },
+    { id: "t-qijing", term: "奇经八脉", cat: "基础", def: "十二经之外的八条经脉：任、督、冲、带、阴跷、阳跷、阴维、阳维。任督与十四经同列本站图谱，余六脉不设穴位。" },
+    { id: "t-biaoli", term: "表里经", cat: "基础", def: "脏腑阴阳相配的一对经脉，如肺经与大肠经互为表里。络穴正是沟通表里两经的桥。" },
+  ];
+  function guideView(termId) {
+    var cats = ["基础", "特定穴", "经典", "针法", "取穴"];
+    var termsHtml = cats.map(function (cat) {
+      var list = GUIDE_TERMS.filter(function (t) { return t.cat === cat; });
+      if (!list.length) return "";
+      return '<h2 class="sec" id="cat-' + cat + '">' + cat + '</h2>' + list.map(function (t) {
+        return '<div class="card" id="' + esc(t.id) + '"><h3>' + esc(t.term) + '</h3><div style="font-size:15px">' + esc(t.def) + '</div></div>';
+      }).join("");
+    }).join("");
+    var steps = [
+      { n: "一", t: "先读理论第一课", d: "到「理论」读〈经络总论〉，约十五分钟，把「经络是什么、穴位怎么定」搞明白。不认识的概念，来本页「术语快释」查。", a: "去读第一课", href: "#/theory/meridian-intro" },
+      { n: "二", t: "每天认识一个穴", d: "首页「每日一穴」每天换一个，点「细读此穴」看定位、主治和居家按揉方法。积少成多，一个月就是三十个穴。", a: "看今日一穴", href: "#/" },
+      { n: "三", t: "自测巩固", d: "「自测」抽穴考你，答错的第二天自动排到最前面复习（间隔复习），记不住也能记住。学累了去「对比卡组」看易混穴。", a: "去自测", href: "#/quiz" },
+    ];
+    var stepsHtml = steps.map(function (s) {
+      return '<div class="card"><h3>第' + s.n + '步 · ' + esc(s.t) + '</h3><div style="font-size:15px">' + esc(s.d) + '</div>' +
+        '<div style="margin-top:10px"><a class="btn" href="' + s.href + '">' + esc(s.a) + ' →</a></div></div>';
+    }).join("");
+    var board = [
+      ["理论", "六门零基础课：经络、取穴、特定穴、灸法安全、保健实操、配穴总则"],
+      ["经络穴位", "十四经木刻古籍图 + 精讲穴卡片；点击穴名看定位、主治、保健用法"],
+      ["经典诵读", "《灵枢》《素问》《难经》原文配白话参考译文；历代注家分歧摆在一起给你看"],
+      ["医案", "古籍里的真实医案，按病症筛选，和条文对账"],
+      ["对比卡组 / 循经点穴 / 自测", "三种巩固方式：易混穴对照记忆、按经脉流注顺序点穴、随机抽穴默背"],
+      ["笔记 / 周报 / 备份", "随手记心得、看学习报告、导出数据（换浏览器前记得备份）"],
+    ];
+    var boardHtml = board.map(function (b) {
+      return '<div class="toc-item" style="cursor:default"><div><div class="t" style="font-size:16px">' + esc(b[0]) + '</div><div class="d">' + esc(b[1]) + '</div></div></div>';
+    }).join("");
+    return '<div class="page"><div class="page-title">入门<span class="zh-dot"> · </span>新手指南</div>' +
+      '<div class="page-sub">三步上手 + 全站导读 + 术语快释 · <span class="src">零基础从这里开始，随时回来查</span></div>' +
+      '<h2 class="sec">三步上手</h2>' + stepsHtml +
+      '<h2 class="sec">全站导读</h2>' + boardHtml +
+      '<div class="warn" style="margin:22px 0">⚠ 安全边界：本站讲的是知识与居家保健（按揉、温和灸）。<strong>不教自行针刺</strong>——针刺实操必须正规面授师承；持续不适请就医，本站不替代诊疗。</div>' +
+      '<h2 class="sec">术语快释</h2>' +
+      '<div class="page-sub">穴位页里点蓝色的特定穴标签，也会跳到这里对应的解释</div>' +
+      termsHtml + '</div>';
+  }
+
   /* ---------- 导出 ---------- */
   window.Views = {
     home: homeView, theory: theoryView, meridians: meridiansView, meridian: meridianView,
     point: pointView, classics: classicsView, classic: classicView, search: searchView,
     notes: notesView, backup: backupView, buildIndex: buildIndex, quiz: quizView,
-    compare: compareView, pathway: pathwayView, cases: casesView, report: reportView,
+    compare: compareView, pathway: pathwayView, cases: casesView, report: reportView, guide: guideView,
     helpers: { esc: esc, MER_ABBR: MER_ABBR, allPoints: allPoints, pointMap: pointMap, chapterMap: chapterMap }
   };
 

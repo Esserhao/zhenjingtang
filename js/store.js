@@ -29,12 +29,12 @@
       var raw = localStorage.getItem(KEY);
       if (raw) {
         var s = JSON.parse(raw);
-        s = { read: s.read || {}, days: s.days || {}, notes: s.notes || {}, daily: s.daily || {}, quiz: s.quiz || {}, recite: s.recite || {}, pathway: s.pathway || {} };
+        s = { read: s.read || {}, days: s.days || {}, notes: s.notes || {}, daily: s.daily || {}, quiz: s.quiz || {}, recite: s.recite || {}, pathway: s.pathway || {}, settings: s.settings || {} };
         migrateNanjingIds(s);
         return s;
       }
     } catch (e) { console.warn("状态读取失败，已重置", e); }
-    return { read: {}, days: {}, notes: {}, daily: {}, quiz: {}, recite: {}, pathway: {} };
+    return { read: {}, days: {}, notes: {}, daily: {}, quiz: {}, recite: {}, pathway: {}, settings: {} };
   }
 
   var state = load();
@@ -170,12 +170,23 @@
       var obj = JSON.parse(text);
       var s = obj && obj.state ? obj.state : obj;
       if (!s || typeof s !== "object" || !s.read) throw new Error("不是针经堂备份文件");
-      state = { read: s.read || {}, days: s.days || {}, notes: s.notes || {}, daily: s.daily || {}, quiz: s.quiz || {}, recite: s.recite || {}, pathway: s.pathway || {} };
+      state = { read: s.read || {}, days: s.days || {}, notes: s.notes || {}, daily: s.daily || {}, quiz: s.quiz || {}, recite: s.recite || {}, pathway: s.pathway || {}, settings: s.settings || {} };
       save();
     },
     clearAll: function () {
-      state = { read: {}, days: {}, notes: {}, daily: {}, quiz: {}, recite: {}, pathway: {} };
+      state = { read: {}, days: {}, notes: {}, daily: {}, quiz: {}, recite: {}, pathway: {}, settings: {} };
       save();
+    },
+    /* ---- 小白友好：新手引导已读标记 + 字号档位（0 标准 / 1 大 / 2 特大） ---- */
+    guideSeen: function () { return !!state.settings.guide; },
+    dismissGuide: function () { state.settings.guide = true; save(); },
+    fontScale: function () { return state.settings.font || 0; },
+    setFontScale: function (n) {
+      state.settings.font = Math.max(0, Math.min(2, n));
+      save();
+      var html = document.documentElement;
+      html.style.fontSize = ["", "112.5%", "125%"][state.settings.font];
+      return state.settings.font;
     }
   };
 })();

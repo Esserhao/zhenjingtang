@@ -39,8 +39,9 @@ body {
   width: 128px; flex-shrink: 0;
   border-right: 1px solid var(--line);
   display: flex; flex-direction: column; align-items: center;
-  padding: 28px 10px 18px;
+  padding: 1.75em 0.6em 1.1em;
   position: sticky; top: 0; height: 100vh;
+  overflow-y: auto; /* 大字号档位下签条超高时侧栏内部滚动，底部控件不被裁剪 */
   background: linear-gradient(180deg, #f1ebdb, var(--paper));
 }
 .brand { cursor: pointer; text-align: center; margin-bottom: 34px; }
@@ -509,4 +510,37 @@ textarea.note-box:focus { border-color: var(--cinnabar); }
   .page { max-width: 100%; }
   .page-title { font-size: 24px; }
   .card, .report-table { box-shadow: none; }
+}
+
+/* ---------- 小白友好：入门/术语/字号/无障碍 ---------- */
+a.tag { text-decoration: none; cursor: pointer; }
+a.tag:hover { background: rgba(61,90,76,.12); }
+.font-toggle { display: flex; gap: 4px; margin-bottom: 10px; }
+.font-btn {
+  font-family: var(--serif-kai); font-size: 12px; line-height: 1;
+  border: 1px solid var(--line); background: #fbf8ef; color: var(--ink-soft);
+  border-radius: 3px; padding: 6px 8px; cursor: pointer; transition: all .15s;
+}
+.font-btn:hover { border-color: var(--cinnabar); color: var(--cinnabar); }
+.font-btn.on { border-color: var(--cinnabar); color: var(--cinnabar); background: rgba(160,58,42,.07); font-weight: 700; }
+/* 键盘焦点可见（普适性硬要求） */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--cinnabar);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* 动效兜底：尊重系统减少动态偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+/* 手机端字号按钮与打卡条并排 */
+@media (max-width: 760px) {
+  .sidebar-foot { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .font-toggle { margin-bottom: 0; }
+  .streak-chip { padding: 4px 8px; }
 }

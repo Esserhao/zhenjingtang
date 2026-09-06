@@ -25,6 +25,7 @@
       <span class="brand-name">针经堂</span>
     </div>
     <div class="nav-tabs">
+      <a class="nav-tab" href="#/guide" data-nav="guide">入门</a>
       <a class="nav-tab" href="#/home" data-nav="home">首页</a>
       <a class="nav-tab" href="#/theory" data-nav="theory">理论</a>
       <a class="nav-tab" href="#/meridians" data-nav="meridians">经络穴位</a>
@@ -41,6 +42,11 @@
       <input id="global-search" type="search" placeholder="搜穴位 / 条文…" autocomplete="off">
     </div>
     <div class="sidebar-foot">
+      <div class="font-toggle no-print" title="字号调节（中老年友好）">
+        <button class="font-btn" data-lv="0" onclick="App.setFont(0)" aria-label="标准字号">A</button>
+        <button class="font-btn" data-lv="1" onclick="App.setFont(1)" aria-label="大字号">A＋</button>
+        <button class="font-btn" data-lv="2" onclick="App.setFont(2)" aria-label="特大字号">A＋＋</button>
+      </div>
       <div id="streak-chip" class="streak-chip" title="连续学习天数"></div>
     </div>
   </nav>
