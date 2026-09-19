@@ -143,6 +143,7 @@
             '<span class="tag moss">理论</span><a href="#/theory">理论五课</a>——经络、腧穴、刺灸安全、特定穴、自我保健<br>' +
             '<span class="tag moss">穴位</span><a href="#/meridians">经络穴位</a>——十四经木刻图与' + allPoints().filter(function (p) { return p.detailed; }).length + '个精讲穴<br>' +
             '<span class="tag moss">经典</span><a href="#/classics">经典诵读</a>——《灵枢》十五篇、素问针灸选篇与《难经》九难<br>' +
+            '<span class="tag moss">歌赋</span><a href="#/verses">针灸歌赋</a>——四总穴歌、八脉交会歌等七首开蒙歌诀<br>' +
             '<span class="tag moss">检索</span><a href="#/search">全文搜索</a>——按穴名、症名、条文查</div>' +
           '</div>' +
         '</div>' +
@@ -398,6 +399,10 @@
         searchIndex.push({ cat: "经典", title: c.title + " · " + (s.label || i + 1), url: "#/classic/" + c.id,
           text: [s.original, s.translation, s.keynotes].join(" "), readId: s.secId });
       });
+    });
+    (window.VERSES || []).forEach(function (v) {
+      searchIndex.push({ cat: "歌赋", title: v.title, url: "#/verses/" + v.id,
+        text: [v.text, v.source, v.note, (v.sections || []).map(function (s) { return s.label + " " + s.plain; }).join(" ")].join(" "), readId: v.id });
     });
   }
   function searchView(q) {
