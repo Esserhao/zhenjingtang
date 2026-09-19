@@ -27,6 +27,7 @@
       case "cases": html = V.cases(); break;
       case "report": html = V.report(); break;
       case "guide": html = V.guide(seg[1]); break;
+      case "verses": html = V.verses(seg[1]); break;
       case "backup": html = V.backup(); break;
       default: html = V.home();
     }

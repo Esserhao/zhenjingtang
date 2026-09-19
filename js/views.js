@@ -15,7 +15,8 @@
   var MER_HAS_IMG = { LU: 1, LI: 1, ST: 1, SP: 1, HT: 1, SI: 1, BL: 1, KI: 1, PC: 1, TE: 1, GB: 1, LV: 1, CV: 1, GV: 1 };
 
   function allPoints() {
-    return (window.ACUPARTS_1 || []).concat(window.ACUPARTS_2 || []).concat(window.ACUPARTS_3 || []);
+    return (window.ACUPARTS_1 || []).concat(window.ACUPARTS_2 || []).concat(window.ACUPARTS_3 || [])
+      .concat(window.ACUPARTS_4 || []).concat(window.ACUPARTS_5 || []).concat(window.ACUPARTS_6 || []);
   }
   var pointMap = {};
   allPoints().forEach(function (p) { pointMap[p.id] = p; });
@@ -725,7 +726,7 @@
     { id: "t-miuci", term: "缪刺 / 巨刺", cat: "针法", def: "左病刺右、右病刺左的交叉取穴法：浅刺络脉为缪刺，深刺经穴为巨刺（《素问·缪刺论》）。" },
     { id: "t-gudu", term: "骨度分寸法", cat: "取穴", def: "把身体某段骨性长度规定为固定「寸」数来折量取穴，人人比例一致。如两乳头之间作 8 寸——这里的「寸」不是尺子上的寸。" },
     { id: "t-tongshen", term: "手指同身寸", cat: "取穴", def: "用自己的手指量自己的身体：拇指指间关节横宽作 1 寸，四指并拢横宽作 3 寸。方便但粗略，重要部位以骨度分寸为准。" },
-    { id: "t-qijing", term: "奇经八脉", cat: "基础", def: "十二经之外的八条经脉：任、督、冲、带、阴跷、阳跷、阴维、阳维。任督与十四经同列本站图谱，余六脉不设穴位。" },
+    { id: "t-qijing", term: "奇经八脉", cat: "基础", def: "十二经之外的八条经脉：任、督、冲、带、阴跷、阳跷、阴维、阳维。任督与十二正经合为十四经，均列本站图谱，余六脉不设穴位。" },
     { id: "t-biaoli", term: "表里经", cat: "基础", def: "脏腑阴阳相配的一对经脉，如肺经与大肠经互为表里。络穴正是沟通表里两经的桥。" },
   ];
   function guideView(termId) {
@@ -767,12 +768,38 @@
       termsHtml + '</div>';
   }
 
+  /* ---------- 针灸歌赋 ---------- */
+  function versesView(verseId) {
+    var all = window.VERSES || [];
+    if (verseId) {
+      var v = all.find(function (x) { return x.id === verseId; });
+      if (!v) return '<div class="empty">未找到歌诀</div>';
+      var secs = (v.sections || []).map(function (sec, i) {
+        return '<div class="section-item card"><div class="original" style="font-size:17px"><span class="sec-no">' + esc(sec.label) + '</span>' + esc(sec.plain) + '</div></div>';
+      }).join("");
+      return '<div class="page">' +
+        '<div class="crumb"><a href="#/verses">针灸歌赋</a> / ' + esc(v.title) + '</div>' +
+        '<div class="page-title">' + esc(v.title) + '</div>' +
+        '<div class="page-sub">' + esc(v.source || "") + '</div>' +
+        '<div class="card" style="border-color:var(--cinnabar)"><div class="original" style="font-size:22px;white-space:pre-line">' + esc(v.text) + '</div>' +
+        (v.note ? '<div class="keynote" style="margin-top:10px"><b>读法</b> · ' + esc(v.note) + '</div>' : '') + '</div>' +
+        secs + '</div>';
+    }
+    var items = all.map(function (v) {
+      return '<div class="toc-item" onclick="location.hash=\'#/verses/' + esc(v.id) + '\'">' +
+        '<div><div class="t">' + esc(v.title) + '</div><div class="d">' + esc(v.source || "") + '</div></div>' +
+        '<div class="d">' + (v.text || "").split("\n").length + ' 行</div></div>';
+    }).join("");
+    return '<div class="page"><div class="page-title">歌赋<span class="zh-dot"> · </span>背诵</div>' +
+      '<div class="page-sub">历代针灸学习以歌诀开蒙 · <span class="src">歌诀为诵读材料，原文之「刺」法须医师操作</span></div>' + items + '</div>';
+  }
+
   /* ---------- 导出 ---------- */
   window.Views = {
     home: homeView, theory: theoryView, meridians: meridiansView, meridian: meridianView,
     point: pointView, classics: classicsView, classic: classicView, search: searchView,
     notes: notesView, backup: backupView, buildIndex: buildIndex, quiz: quizView,
-    compare: compareView, pathway: pathwayView, cases: casesView, report: reportView, guide: guideView,
+    compare: compareView, pathway: pathwayView, cases: casesView, report: reportView, guide: guideView, verses: versesView,
     helpers: { esc: esc, MER_ABBR: MER_ABBR, allPoints: allPoints, pointMap: pointMap, chapterMap: chapterMap }
   };
 

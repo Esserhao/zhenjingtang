@@ -18,9 +18,10 @@ const load = (f) => {
 };
 const errors = [];
 const warn = [];
+const vsSeen = {};
 
 /* ---------- 加载与语法 ---------- */
-const files = ["data/acupoints-1.js", "data/acupoints-2.js", "data/acupoints-3.js", "data/meridian-index.js", "data/theory.js", "data/classics.js", "data/nanjing.js", "data/suwen.js", "data/compare.js"];
+const files = ["data/acupoints-1.js", "data/acupoints-2.js", "data/acupoints-3.js", "data/meridian-index.js", "data/theory.js", "data/classics.js", "data/nanjing.js", "data/suwen.js", "data/compare.js", "data/verses.js", "data/acupoints-4.js", "data/acupoints-5.js", "data/acupoints-6.js"];
 let syntaxOK = true;
 for (const f of files) {
   try {
@@ -31,7 +32,8 @@ for (const f of files) {
   }
 }
 
-const pts = (window.ACUPARTS_1 || []).concat(window.ACUPARTS_2 || []).concat(window.ACUPARTS_3 || []);
+const pts = (window.ACUPARTS_1 || []).concat(window.ACUPARTS_2 || []).concat(window.ACUPARTS_3 || [])
+  .concat(window.ACUPARTS_4 || []).concat(window.ACUPARTS_5 || []).concat(window.ACUPARTS_6 || []);
 const idx = window.MERIDIAN_INDEX || [];
 const theory = window.THEORY || [];
 const lingshu = window.LINGSHU || [];
@@ -149,10 +151,18 @@ for (const g of window.COMPARE_GROUPS || []) {
   }
 }
 
+/* ---------- 歌赋 ---------- */
+for (const v of window.VERSES || []) {
+  if (!v.id || !v.title || !v.text) errors.push("歌诀缺 id/title/text: " + (v.id || "?"));
+  if (vsSeen[v.id]) errors.push("歌诀 id 重复: " + v.id);
+  vsSeen[v.id] = 1;
+  for (const sec of v.sections || []) if (!sec.label || !sec.plain) errors.push("歌诀 section 缺 label/plain: " + v.id);
+}
+
 /* ---------- 汇总 ---------- */
 console.log("== 针经堂数据校验 ==");
 console.log("精讲穴 " + pts.filter((p) => p.detailed).length + " / 总条目 " + pts.length +
-  "；经脉索引 " + idx.length + " 条；理论 " + theory.length + " 课；灵枢 " + lingshu.length + " 篇 + 素问 " + suwen.length + " 篇 + 难经 " + nanjing.length + " 难");
+  "；经脉索引 " + idx.length + " 条；理论 " + theory.length + " 课；灵枢 " + lingshu.length + " 篇 + 素问 " + suwen.length + " 篇 + 难经 " + nanjing.length + " 难 + 歌诀 " + (window.VERSES || []).length + " 首");
 if (warn.length) {
   console.log("警告 " + warn.length + " 条：");
   warn.forEach((w) => console.log("  ⚠ " + w));
